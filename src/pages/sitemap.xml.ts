@@ -71,9 +71,6 @@ export async function GET(context: APIContext) {
       let loc = page.url.startsWith('http')
         ? page.url
         : new URL(page.url, siteUrl).toString();
-      if (loc === 'https://hawksley.dev/') {
-        loc = 'https://hawksley.dev';
-      }
 
       const lastmodTag = page.lastmod
         ? `\n    <lastmod>${page.lastmod}</lastmod>`

@@ -41,7 +41,7 @@ const jsonLd = {
       '@type': 'WebPage',
       '@id': `${postUrl}#webpage`,
       url: postUrl,
-      isPartOf: { '@id': 'https://hawksley.dev#website' },
+      isPartOf: { '@id': 'https://hawksley.dev/#website' },
       name: post.data.title,
       inLanguage: 'en',
       mainEntity: { '@id': `${postUrl}#blogposting` },
@@ -61,7 +61,7 @@ const jsonLd = {
       url: 'https://hawksley.dev/blog',
       name: "Ethan Hawksley's Blog",
       inLanguage: 'en',
-      publisher: { '@id': 'https://hawksley.dev#person' },
+      publisher: { '@id': 'https://hawksley.dev/#person' },
     },
     {
       '@type': 'BlogPosting',
@@ -77,8 +77,8 @@ const jsonLd = {
       datePublished: post.data.pubDate.toISOString(),
       dateModified:
         post.data.modDate?.toISOString() ?? post.data.pubDate.toISOString(),
-      author: { '@id': 'https://hawksley.dev#person' },
-      publisher: { '@id': 'https://hawksley.dev#person' },
+      author: { '@id': 'https://hawksley.dev/#person' },
+      publisher: { '@id': 'https://hawksley.dev/#person' },
       image: {
         '@type': 'ImageObject',
         url: ogImageUrl,

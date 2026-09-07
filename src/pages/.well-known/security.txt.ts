@@ -4,7 +4,7 @@ export const GET: APIRoute = () => {
   const expires = new Date();
   expires.setFullYear(expires.getFullYear() + 1);
 
-  const content = `Contact: https://hawksley.dev
+  const content = `Contact: https://hawksley.dev/
 Encryption: https://hawksley.dev/key.asc
 Expires: ${expires.toISOString()}
 Preferred-Languages: en

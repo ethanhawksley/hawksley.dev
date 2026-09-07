@@ -30,8 +30,8 @@ const projectJsonLds = allProjects.map((project) => {
       url: 'https://hawksley.dev/the-second-maintainer',
       name: project.data.name,
       description: project.data.description,
-      author: { '@id': 'https://hawksley.dev#person' },
-      publisher: { '@id': 'https://hawksley.dev#person' },
+      author: { '@id': 'https://hawksley.dev/#person' },
+      publisher: { '@id': 'https://hawksley.dev/#person' },
     };
   }
 
@@ -44,7 +44,7 @@ const projectJsonLds = allProjects.map((project) => {
     name: project.data.name,
     description: project.data.description,
     applicationCategory: project.data.applicationCategory,
-    creator: { '@id': 'https://hawksley.dev#person' },
+    creator: { '@id': 'https://hawksley.dev/#person' },
     sameAs: project.data.links?.map((link) => link.url),
   };
 });
@@ -56,12 +56,12 @@ const jsonLd = {
     websiteJsonLd,
     {
       '@type': 'ProfilePage',
-      '@id': 'https://hawksley.dev#webpage',
-      url: 'https://hawksley.dev',
-      isPartOf: { '@id': 'https://hawksley.dev#website' },
+      '@id': 'https://hawksley.dev/#webpage',
+      url: 'https://hawksley.dev/',
+      isPartOf: { '@id': 'https://hawksley.dev/#website' },
       name: 'About Ethan Hawksley',
       inLanguage: 'en',
-      mainEntity: { '@id': 'https://hawksley.dev#person' },
+      mainEntity: { '@id': 'https://hawksley.dev/#person' },
       primaryImageOfPage: {
         '@type': 'ImageObject',
         url: 'https://hawksley.dev/ethan-hawksley.jpg',

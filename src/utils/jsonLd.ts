@@ -2,14 +2,14 @@ import { allProfileUrls } from './profiles';
 
 export const websiteJsonLd = {
   '@type': 'WebSite',
-  '@id': 'https://hawksley.dev#website',
-  url: 'https://hawksley.dev',
+  '@id': 'https://hawksley.dev/#website',
+  url: 'https://hawksley.dev/',
   name: 'Ethan Hawksley',
   alternateName: ['hawksley.dev', 'Hawksley'],
   description:
     'The personal site and blog of Ethan Hawksley, a Computer Science student in the UK with a focus on systems programming and cybersecurity.',
   inLanguage: 'en',
-  publisher: { '@id': 'https://hawksley.dev#person' },
+  publisher: { '@id': 'https://hawksley.dev/#person' },
   image: {
     '@type': 'ImageObject',
     url: 'https://hawksley.dev/hawksley-dev-logo.png',
@@ -22,9 +22,9 @@ export const websiteJsonLd = {
 
 export const personJsonLd = {
   '@type': 'Person',
-  '@id': 'https://hawksley.dev#person',
-  url: 'https://hawksley.dev',
-  mainEntityOfPage: { '@id': 'https://hawksley.dev#webpage' },
+  '@id': 'https://hawksley.dev/#person',
+  url: 'https://hawksley.dev/',
+  mainEntityOfPage: { '@id': 'https://hawksley.dev/#webpage' },
   name: 'Ethan Hawksley',
   givenName: 'Ethan',
   familyName: 'Hawksley',
@@ -95,7 +95,7 @@ export const personJsonLd = {
 
 export const websiteRef = {
   '@type': 'WebSite',
-  '@id': 'https://hawksley.dev#website',
-  url: 'https://hawksley.dev',
+  '@id': 'https://hawksley.dev/#website',
+  url: 'https://hawksley.dev/',
   name: 'Ethan Hawksley',
 } as const;

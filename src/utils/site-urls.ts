@@ -17,7 +17,7 @@ export async function getContentUrls() {
   const allChapters = await getSortedSecondMaintainer();
 
   const contentPaths = [
-    '',
+    '/',
     '/blog',
     '/elsewhere',
     '/the-second-maintainer',

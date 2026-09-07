@@ -15,7 +15,7 @@ const jsonLd = {
       '@type': 'CollectionPage',
       '@id': 'https://hawksley.dev/blog#webpage',
       url: 'https://hawksley.dev/blog',
-      isPartOf: { '@id': 'https://hawksley.dev#website' },
+      isPartOf: { '@id': 'https://hawksley.dev/#website' },
       name: "Ethan Hawksley's Blog",
       description:
         'A blog by Ethan Hawksley, a Computer Science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.',
@@ -33,13 +33,13 @@ const jsonLd = {
     {
       '@type': 'Blog',
       '@id': 'https://hawksley.dev/blog#blog',
-      isPartOf: { '@id': 'https://hawksley.dev#website' },
+      isPartOf: { '@id': 'https://hawksley.dev/#website' },
       mainEntityOfPage: { '@id': 'https://hawksley.dev/blog#webpage' },
       name: "Ethan Hawksley's Blog",
       description:
         'A blog by Ethan Hawksley, a Computer Science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.',
       inLanguage: 'en',
-      publisher: { '@id': 'https://hawksley.dev#person' },
+      publisher: { '@id': 'https://hawksley.dev/#person' },
       license: 'https://creativecommons.org/licenses/by/4.0/',
     },
   ],

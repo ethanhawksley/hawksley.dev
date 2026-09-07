@@ -41,14 +41,11 @@ const {
   preloadType,
 } = Astro.props;
 
-const cleanPath = Astro.url.pathname
-  .replace(/(index)?\.html$/, '')
-  .replace(/\/$/, '');
-const isHome = cleanPath === '';
+const cleanPath = Astro.url.pathname.replace(/(index)?\.html$/, '');
 
-const canonicalUrl = isHome
-  ? 'https://hawksley.dev'
-  : new URL(cleanPath, Astro.site).toString();
+const isHome = cleanPath === '/';
+
+const canonicalUrl = new URL(cleanPath, Astro.site).toString();
 
 const isIndexable = !robots.includes('noindex');
 ---
@@ -200,7 +197,7 @@ const isIndexable = !robots.includes('noindex');
                   content={article.modifiedTime}
                 />
               )}
-              <meta property="article:author" content="https://hawksley.dev" />
+              <meta property="article:author" content="https://hawksley.dev/" />
               <meta
                 property="article:section"
                 content={article.tags[0] ?? 'Computer Science'}

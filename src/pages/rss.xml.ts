@@ -11,7 +11,7 @@ function escapeXml(str: string): string {
 
 export async function GET() {
   const allPosts = await getSortedPosts();
-  const siteUrl = 'https://hawksley.dev';
+  const siteUrl = 'https://hawksley.dev/';
 
   const title = "Ethan Hawksley's Blog";
   const description =
@@ -20,7 +20,7 @@ export async function GET() {
   const itemsXml = (
     await Promise.all(
       allPosts.map(async (post) => {
-        const postUrl = `${siteUrl}/blog/${post.id}`;
+        const postUrl = `${siteUrl}blog/${post.id}`;
         const contentHtml = await getPostHtml(post);
         const categories = post.data.tags
           .map((tag) => `<category>${escapeXml(tag)}</category>`)
@@ -31,7 +31,7 @@ export async function GET() {
     )
   ).join('');
 
-  const rssXml = `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>${escapeXml(title)}</title><description>${escapeXml(description)}</description><link>${siteUrl}</link><language>en</language><copyright>Content licensed under CC BY 4.0</copyright><atom:link href="${siteUrl}/rss.xml" rel="self" type="application/rss+xml"/>${itemsXml}</channel></rss>`;
+  const rssXml = `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>${escapeXml(title)}</title><description>${escapeXml(description)}</description><link>${siteUrl}</link><language>en</language><copyright>Content licensed under CC BY 4.0</copyright><atom:link href="${siteUrl}rss.xml" rel="self" type="application/rss+xml"/>${itemsXml}</channel></rss>`;
 
   return new Response(rssXml, {
     headers: {
