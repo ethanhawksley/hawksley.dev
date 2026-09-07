@@ -44,6 +44,12 @@ const projectJsonLds = allProjects.map((project) => {
     name: project.data.name,
     description: project.data.description,
     applicationCategory: project.data.applicationCategory,
+    operatingSystem: 'Any',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'GBP',
+    },
     creator: { '@id': 'https://hawksley.dev/#person' },
     sameAs: project.data.links?.map((link) => link.url),
   };
