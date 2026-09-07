@@ -1,7 +1,7 @@
 {
   "name": "Ethan Hawksley",
   "short_name": "hawksley.dev",
-  "description": "The personal site and blog of Ethan Hawksley, a Computer Science student in the UK with a focus on systems programming and cybersecurity.",
+  "description": "The personal site and blog of Ethan Hawksley, a Computer Science student at the University of Warwick and author of The Second Maintainer.",
   "start_url": "/",
   "theme_color": "#bf3900",
   "background_color": "#fafafa",

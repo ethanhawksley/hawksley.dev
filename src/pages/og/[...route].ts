@@ -57,7 +57,7 @@ export async function getStaticPaths() {
         page: {
           title: 'Ethan Hawksley',
           description:
-            'Computer Science student in the UK focusing on systems programming and cybersecurity.',
+            'Computer Science student at the University of Warwick and author of The Second Maintainer.',
         },
       },
     },

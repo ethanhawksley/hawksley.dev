@@ -29,9 +29,9 @@ export const personJsonLd = {
   givenName: 'Ethan',
   familyName: 'Hawksley',
   description:
-    'Computer Science student in the UK with a focus on systems programming and cybersecurity.',
+    'Computer Science student at the University of Warwick and author of The Second Maintainer, focusing on systems programming and cybersecurity.',
   disambiguatingDescription:
-    'Computer Science student & systems/cybersecurity enthusiast, UK',
+    'Computer Science student & systems/cybersecurity enthusiast, University of Warwick, UK',
   jobTitle: 'Computer Science Student',
   knowsLanguage: 'en',
   knowsAbout: [
