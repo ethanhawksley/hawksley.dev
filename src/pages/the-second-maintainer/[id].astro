@@ -68,7 +68,7 @@ const jsonLd = {
       url: chapterUrl,
       mainEntityOfPage: { '@id': `${chapterUrl}#webpage` },
       isPartOf: { '@id': 'https://hawksley.dev/the-second-maintainer#book' },
-      name: fullTitle,
+      name: chapter.data.title,
       headline: fullTitle,
       description: chapter.data.metaDescription,
       position: chapter.data.index,
@@ -90,21 +90,14 @@ const jsonLd = {
       itemListElement: [
         {
           '@type': 'ListItem',
-          item: 'https://hawksley.dev',
-          position: 1,
-          name: 'Home',
-        },
-        {
-          '@type': 'ListItem',
           item: 'https://hawksley.dev/the-second-maintainer',
-          position: 2,
+          position: 1,
           name: 'The Second Maintainer',
         },
         {
           '@type': 'ListItem',
-          item: chapterUrl,
-          position: 3,
-          name: fullTitle,
+          position: 2,
+          name: chapter.data.title,
         },
       ],
     },

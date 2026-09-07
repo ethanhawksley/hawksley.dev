@@ -21,7 +21,6 @@ const jsonLd = {
         'A blog by Ethan Hawksley, a Computer Science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.',
       inLanguage: 'en',
       mainEntity: { '@id': 'https://hawksley.dev/blog#blog' },
-      breadcrumb: { '@id': 'https://hawksley.dev/blog#breadcrumb' },
       primaryImageOfPage: {
         '@type': 'ImageObject',
         url: 'https://hawksley.dev/ethan-hawksley.jpg',
@@ -42,24 +41,6 @@ const jsonLd = {
       inLanguage: 'en',
       publisher: { '@id': 'https://hawksley.dev#person' },
       license: 'https://creativecommons.org/licenses/by/4.0/',
-    },
-    {
-      '@type': 'BreadcrumbList',
-      '@id': 'https://hawksley.dev/blog#breadcrumb',
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          item: 'https://hawksley.dev',
-          position: 1,
-          name: 'Home',
-        },
-        {
-          '@type': 'ListItem',
-          item: 'https://hawksley.dev/blog',
-          position: 2,
-          name: 'Blog',
-        },
-      ],
     },
   ],
 };

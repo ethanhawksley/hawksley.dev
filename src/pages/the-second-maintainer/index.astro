@@ -43,7 +43,6 @@ const jsonLd = {
       description,
       inLanguage: 'en',
       mainEntity: { '@id': `${pageUrl}#book` },
-      breadcrumb: { '@id': `${pageUrl}#breadcrumb` },
       primaryImageOfPage: {
         '@type': 'ImageObject',
         url: coverImageUrl,
@@ -89,24 +88,6 @@ const jsonLd = {
           bookFormat: 'https://schema.org/Paperback',
           inLanguage: 'en',
           datePublished: '2026-09-02',
-        },
-      ],
-    },
-    {
-      '@type': 'BreadcrumbList',
-      '@id': `${pageUrl}#breadcrumb`,
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          item: 'https://hawksley.dev',
-          position: 1,
-          name: 'Home',
-        },
-        {
-          '@type': 'ListItem',
-          item: pageUrl,
-          position: 2,
-          name: 'The Second Maintainer',
         },
       ],
     },
