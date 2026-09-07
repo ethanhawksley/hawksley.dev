@@ -1,7 +1,7 @@
 ---
 import A from './A.astro';
 import PostPreview from './PostPreview.astro';
-import { getSortedPosts } from '../utils/content-helpers';
+import { getSortedPosts, getReadingTime } from '../utils/content-helpers';
 
 const allPosts = await getSortedPosts();
 const postCount = allPosts.length;
@@ -17,7 +17,7 @@ const postCount = allPosts.length;
           title={post.data.title}
           description={post.data.description}
           pubDate={post.data.pubDate}
-          tags={post.data.tags}
+          readingTime={getReadingTime(post.body)}
           headingLevel="h3"
         />
       ))

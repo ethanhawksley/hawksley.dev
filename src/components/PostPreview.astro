@@ -7,10 +7,11 @@ interface Props {
   title: string;
   description: string;
   pubDate: Date;
-  tags: string[];
+  readingTime: number;
   headingLevel: 'h2' | 'h3';
 }
-const { href, title, description, pubDate, tags, headingLevel } = Astro.props;
+const { href, title, description, pubDate, readingTime, headingLevel } =
+  Astro.props;
 const Heading = headingLevel;
 ---
 
@@ -22,15 +23,10 @@ const Heading = headingLevel;
       <span>
         <FormattedDate date={pubDate} />
       </span>
-      {
-        tags.length > 0 && (
-          <>
-            <span aria-hidden="true">/</span>
-            <span class="sr-only">Tags: </span>
-            <span class="tags">{tags.join(', ')}</span>
-          </>
-        )
-      }
+      <span aria-hidden="true">·</span>
+      <time class="read-time" datetime=`PT${readingTime}M`
+        >{readingTime} min read</time
+      >
     </footer>
   </article>
 </li>
@@ -69,7 +65,7 @@ const Heading = headingLevel;
     color: var(--color-text-muted);
   }
 
-  .tags {
+  .read-time {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;

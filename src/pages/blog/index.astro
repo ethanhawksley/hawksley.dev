@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import PostPreview from '../../components/PostPreview.astro';
-import { getSortedPosts } from '../../utils/content-helpers';
+import { getSortedPosts, getReadingTime } from '../../utils/content-helpers';
 import { personJsonLd, websiteRef } from '../../utils/jsonLd';
 
 const allPosts = await getSortedPosts();
@@ -65,7 +65,7 @@ const ogImageUrl = new URL('/og/blog.jpg', Astro.site).toString();
           title={post.data.title}
           description={post.data.description}
           pubDate={post.data.pubDate}
-          tags={post.data.tags}
+          readingTime={getReadingTime(post.body)}
           headingLevel="h2"
         />
       ))

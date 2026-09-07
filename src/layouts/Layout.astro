@@ -17,7 +17,6 @@ interface Props {
   article?: {
     publishedTime: string;
     modifiedTime?: string;
-    tags: string[];
     readingTime: number;
   };
   preloadImage?: string;
@@ -198,13 +197,6 @@ const isIndexable = !robots.includes('noindex');
                 />
               )}
               <meta property="article:author" content="https://hawksley.dev/" />
-              <meta
-                property="article:section"
-                content={article.tags[0] ?? 'Computer Science'}
-              />
-              {article.tags.map((tag) => (
-                <meta property="article:tag" content={tag} />
-              ))}
             </>
           )}
 

@@ -22,11 +22,8 @@ export async function GET() {
       allPosts.map(async (post) => {
         const postUrl = `${siteUrl}blog/${post.id}`;
         const contentHtml = await getPostHtml(post);
-        const categories = post.data.tags
-          .map((tag) => `<category>${escapeXml(tag)}</category>`)
-          .join('');
 
-        return `<item><title>${escapeXml(post.data.title)}</title><link>${postUrl}</link><guid isPermaLink="true">${postUrl}</guid><description>${escapeXml(post.data.description)}</description><pubDate>${post.data.pubDate.toUTCString()}</pubDate><content:encoded>${escapeXml(contentHtml)}</content:encoded>${categories}</item>`;
+        return `<item><title>${escapeXml(post.data.title)}</title><link>${postUrl}</link><guid isPermaLink="true">${postUrl}</guid><description>${escapeXml(post.data.description)}</description><pubDate>${post.data.pubDate.toUTCString()}</pubDate><content:encoded>${escapeXml(contentHtml)}</content:encoded></item>`;
       }),
     )
   ).join('');

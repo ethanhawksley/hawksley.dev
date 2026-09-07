@@ -46,3 +46,10 @@ export async function getPostHtml(post: CollectionEntry<'posts'>) {
 
   return html;
 }
+
+const WORDS_PER_MINUTE = 238;
+
+export function getReadingTime(content: string | undefined) {
+  const words = (content ?? '').split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
+}

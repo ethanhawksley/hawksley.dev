@@ -6,7 +6,7 @@ import A from '../../components/A.astro';
 import BlogImage from '../../components/BlogImage.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
-import { getSortedPosts } from '../../utils/content-helpers';
+import { getReadingTime, getSortedPosts } from '../../utils/content-helpers';
 import { personJsonLd, websiteRef } from '../../utils/jsonLd';
 
 export const getStaticPaths = (async () => {
@@ -25,8 +25,7 @@ export const getStaticPaths = (async () => {
 const { post, prevPost, nextPost } = Astro.props;
 const { Content } = await render(post);
 
-const words = (post.body ?? '').split(/\s+/).length;
-const readingTime = Math.max(1, Math.ceil(words / 238));
+const readingTime = getReadingTime(post.body);
 
 const postUrl = `https://hawksley.dev/blog/${post.id}`;
 
@@ -71,8 +70,6 @@ const jsonLd = {
       isPartOf: { '@id': 'https://hawksley.dev/blog#blog' },
       headline: post.data.title,
       description: post.data.metaDescription,
-      articleSection: post.data.tags[0] ?? 'Computer Science',
-      ...(post.data.tags.length > 0 && { keywords: post.data.tags.join(', ') }),
       inLanguage: 'en',
       datePublished: post.data.pubDate.toISOString(),
       dateModified:
@@ -118,7 +115,6 @@ const jsonLd = {
   article={{
     publishedTime: post.data.pubDate.toISOString(),
     modifiedTime: post.data.modDate?.toISOString(),
-    tags: post.data.tags,
     readingTime,
   }}
 >
@@ -159,26 +155,16 @@ const jsonLd = {
       <div class="post-meta-wrapper">
         <ul class="post-meta" role="list">
           <li>Published <FormattedDate date={post.data.pubDate} /></li>
+          <li>
+            <time datetime=`PT${readingTime}M`>{readingTime} min read</time>
+          </li>
           {
             post.data.modDate && (
               <li>
-                Modified <FormattedDate date={post.data.modDate} />
+                Updated <FormattedDate date={post.data.modDate} />
               </li>
             )
           }
-          <li>
-            <span>{readingTime} min read</span>
-            {
-              post.data.tags.length > 0 && (
-                <>
-                  <span class="nested-meta">
-                    <span class="sr-only">Tags: </span>
-                    <span>{post.data.tags.join(', ')}</span>
-                  </span>
-                </>
-              )
-            }
-          </li>
         </ul>
       </div>
     </header>
