@@ -8,7 +8,7 @@ import LatestPosts from '../components/LatestPosts.astro';
 import ProjectPreview from '../components/ProjectPreview.astro';
 import SocialLinks from '../components/SocialLinks.astro';
 
-import { getSortedProjects } from '../utils/content-helpers';
+import { getSortedPosts, getSortedProjects } from '../utils/content-helpers';
 import { personJsonLd, websiteJsonLd } from '../utils/jsonLd';
 
 // Inline low quality avif since home page fits into initcwd
@@ -57,6 +57,9 @@ const projectJsonLds = allProjects.map((project) => {
   };
 });
 
+const allPosts = await getSortedPosts();
+const lastModified = allPosts[0].data.pubDate.toISOString();
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -70,6 +73,8 @@ const jsonLd = {
       name: 'About Ethan Hawksley',
       inLanguage: 'en',
       mainEntity: { '@id': 'https://hawksley.dev/#person' },
+      dateCreated: '2024-09-10T00:00:00.000Z',
+      dateModified: lastModified,
       primaryImageOfPage: {
         '@type': 'ImageObject',
         url: 'https://hawksley.dev/ethan-hawksley.jpg',
