@@ -39,49 +39,22 @@
     }
   });
 
-  // Tell GoatCounter not to auto-count on DOMContentLoaded so we can control it with Astro
-  window.goatcounter = window.goatcounter || {};
-  window.goatcounter.no_onload = true;
+  const goatcounter = {
+    no_onload: true,
+  };
 
-  // Track on initial page load AND on every client-side page navigation
   document.addEventListener('astro:page-load', () => {
-    if (window.goatcounter && window.goatcounter.count) {
-      window.goatcounter.count();
+    if (goatcounter.count) {
+      goatcounter.count();
     }
   });
 
-  // GoatCounter: https://www.goatcounter.com
-  // This file is released under the ISC license: https://opensource.org/licenses/ISC
-  (function () {
+  (function (goatcounter) {
     'use strict';
-
-    // Load settings from data-goatcounter-settings.
-    var s = document.querySelector('script[data-goatcounter]');
-    if (s && s.dataset.goatcounterSettings) {
-      try {
-        var set = JSON.parse(s.dataset.goatcounterSettings);
-      } catch (err) {
-        console.error('invalid JSON in data-goatcounter-settings: ' + err);
-      }
-      for (var k in set)
-        if (
-          [
-            'no_onload',
-            'no_events',
-            'allow_local',
-            'allow_frame',
-            'path',
-            'title',
-            'referrer',
-            'event',
-          ].indexOf(k) > -1
-        )
-          window.goatcounter[k] = set[k];
-    }
 
     var enc = encodeURIComponent;
 
-    window.goatcounter.get_data = function (vars) {
+    goatcounter.get_data = function (vars) {
       vars = vars || {};
       var data = {
         p: vars.path === undefined ? goatcounter.path : vars.path,
@@ -144,10 +117,6 @@
       if (console && 'warn' in console) console.warn('goatcounter: ' + msg);
     };
 
-    var get_endpoint = function () {
-      return 'https://g.hawksley.dev/count';
-    };
-
     var get_path = function () {
       var loc = location,
         c = document.querySelector('link[rel="canonical"][href]');
@@ -175,7 +144,7 @@
       else f();
     };
 
-    window.goatcounter.filter = function () {
+    goatcounter.filter = function () {
       if (
         'visibilityState' in document &&
         document.visibilityState === 'prerender'
@@ -192,23 +161,20 @@
         return 'localhost';
       if (!goatcounter.allow_local && location.protocol === 'file:')
         return 'localfile';
-      if (localStorage && localStorage.getItem('skipgc') === 't')
-        return 'disabled with #toggle-goatcounter';
       return false;
     };
 
-    window.goatcounter.url = function (vars) {
-      var data = window.goatcounter.get_data(vars || {});
+    goatcounter.url = function (vars) {
+      var data = goatcounter.get_data(vars || {});
       if (data.p === null) return;
       data.rnd = Math.random().toString(36).substr(2, 5);
 
-      var endpoint = get_endpoint();
-      if (!endpoint) return warn('no endpoint found');
+      var endpoint = 'https://g.hawksley.dev/count';
 
       return endpoint + urlencode(data);
     };
 
-    window.goatcounter.count = function (vars) {
+    goatcounter.count = function (vars) {
       var f = goatcounter.filter();
       if (f) return warn('not counting because of: ' + f);
       var url = goatcounter.url(vars);
@@ -233,14 +199,7 @@
       }
     };
 
-    window.goatcounter.get_query = function (name) {
-      var s = location.search.substr(1).split('&');
-      for (var i = 0; i < s.length; i++)
-        if (s[i].toLowerCase().indexOf(name.toLowerCase() + '=') === 0)
-          return s[i].substr(name.length + 1);
-    };
-
-    window.goatcounter.bind_events = function () {
+    goatcounter.bind_events = function () {
       if (!document.querySelectorAll) return;
 
       var send = function (elem) {
@@ -272,20 +231,6 @@
         });
     };
 
-    if (location.hash === '#toggle-goatcounter') {
-      if (localStorage.getItem('skipgc') === 't') {
-        localStorage.removeItem('skipgc');
-        alert('GoatCounter tracking is now ENABLED in this browser.');
-      } else {
-        localStorage.setItem('skipgc', 't');
-        alert(
-          'GoatCounter tracking is now DISABLED in this browser until ' +
-            location +
-            ' is loaded again.',
-        );
-      }
-    }
-
     if (!goatcounter.no_events) on_load(goatcounter.bind_events);
-  })();
+  })(goatcounter);
 </script>
