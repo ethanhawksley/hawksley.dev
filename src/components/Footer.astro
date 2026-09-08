@@ -6,9 +6,9 @@ const year = new Date().getFullYear();
 
 <footer>
   <small>
-    <span class="group">
+    <span class="group first-group">
       <span>&copy; {year} Ethan Hawksley</span>
-      <span aria-hidden="true" class="dot">·</span>
+      <span aria-hidden="true" class="dot first-dot">·</span>
       <A href="https://github.com/ethanhawksley/hawksley.dev" pressable
         >Source</A
       >
@@ -52,8 +52,23 @@ const year = new Date().getFullYear();
     justify-content: center;
   }
 
+  .first-group {
+    flex-direction: column;
+  }
+
+  .first-dot,
   .mid-dot {
     display: none;
+  }
+
+  @media (min-width: 17em) {
+    .first-group {
+      flex-direction: row;
+    }
+
+    .first-dot {
+      display: inline;
+    }
   }
 
   @media (min-width: 30em) {
