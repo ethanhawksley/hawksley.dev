@@ -1,5 +1,7 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import { marked } from 'marked';
+
+import type { CollectionEntry } from 'astro:content';
 
 export async function getSortedProjects() {
   const projects = await getCollection('projects');

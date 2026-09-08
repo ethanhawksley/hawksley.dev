@@ -1,7 +1,9 @@
-import type { APIContext, GetStaticPaths } from 'astro';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+
 import { getSortedPosts } from '../../../utils/content-helpers';
+
+import type { APIContext, GetStaticPaths } from 'astro';
 
 const MIME_TYPES: Record<string, string> = {
   '.jpg': 'image/jpeg',

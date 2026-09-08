@@ -1,8 +1,9 @@
-import type { APIContext } from 'astro';
 import {
   getSortedPosts,
   getSortedSecondMaintainer,
 } from '../utils/content-helpers';
+
+import type { APIContext } from 'astro';
 
 interface SitemapPage {
   url: string;

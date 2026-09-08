@@ -1,11 +1,13 @@
 ---
 import fs from 'node:fs';
 import path from 'node:path';
+
 import Layout from '../layouts/Layout.astro';
 import A from '../components/A.astro';
-import SocialLinks from '../components/SocialLinks.astro';
-import ProjectPreview from '../components/ProjectPreview.astro';
 import LatestPosts from '../components/LatestPosts.astro';
+import ProjectPreview from '../components/ProjectPreview.astro';
+import SocialLinks from '../components/SocialLinks.astro';
+
 import { getSortedProjects } from '../utils/content-helpers';
 import { personJsonLd, websiteJsonLd } from '../utils/jsonLd';
 

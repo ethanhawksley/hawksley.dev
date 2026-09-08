@@ -1,7 +1,7 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import compress from 'astro-compress';
+import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   site: 'https://hawksley.dev',

@@ -1,4 +1,4 @@
-import { getSortedPosts, getPostHtml } from '../utils/content-helpers';
+import { getPostHtml, getSortedPosts } from '../utils/content-helpers';
 
 export async function GET() {
   const allPosts = await getSortedPosts();

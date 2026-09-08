@@ -1,11 +1,13 @@
 ---
 import fs from 'node:fs';
 import path from 'node:path';
+
 import Layout from '../../layouts/Layout.astro';
 import A from '../../components/A.astro';
-import { personJsonLd, websiteRef } from '../../utils/jsonLd';
-import { getSortedSecondMaintainer } from '../../utils/content-helpers';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
+
+import { getSortedSecondMaintainer } from '../../utils/content-helpers';
+import { personJsonLd, websiteRef } from '../../utils/jsonLd';
 
 const allChapters = await getSortedSecondMaintainer();
 const firstChapter = allChapters[0];

@@ -1,13 +1,16 @@
 ---
-import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
+
 import Layout from '../../layouts/Layout.astro';
 import A from '../../components/A.astro';
 import BlogImage from '../../components/BlogImage.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
+
 import { getReadingTime, getSortedPosts } from '../../utils/content-helpers';
 import { personJsonLd, websiteRef } from '../../utils/jsonLd';
+
+import type { GetStaticPaths } from 'astro';
 
 export const getStaticPaths = (async () => {
   const allPosts = await getSortedPosts();

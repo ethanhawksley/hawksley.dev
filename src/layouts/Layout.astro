@@ -1,8 +1,10 @@
 ---
-import Navigation from '../components/Navigation.astro';
+import { ClientRouter } from 'astro:transitions';
+
 import Footer from '../components/Footer.astro';
 import Misc from '../components/Misc.astro';
-import { ClientRouter } from 'astro:transitions';
+import Navigation from '../components/Navigation.astro';
+
 import { VERSION } from '../pages/og/[...route]';
 
 interface Props {

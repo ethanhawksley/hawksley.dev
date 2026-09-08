@@ -1,7 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import PostPreview from '../../components/PostPreview.astro';
-import { getSortedPosts, getReadingTime } from '../../utils/content-helpers';
+
+import { getReadingTime, getSortedPosts } from '../../utils/content-helpers';
 import { personJsonLd, websiteRef } from '../../utils/jsonLd';
 
 const allPosts = await getSortedPosts();
