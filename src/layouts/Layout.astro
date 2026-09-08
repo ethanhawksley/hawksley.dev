@@ -349,6 +349,8 @@ const isIndexable = !robots.includes('noindex');
     --font-sans: 'IBM Sans Subset', sans-serif;
     --font-mono: 'IBM Mono Subset', monospace;
 
+    --page-padding-x: clamp(0rem, 10vw - 1.5rem, 1.5rem);
+
     --img-theme-filter: none;
   }
 
@@ -663,8 +665,8 @@ const isIndexable = !robots.includes('noindex');
 
   main {
     flex-grow: 1;
-    padding-right: max(1.5rem, env(safe-area-inset-right));
-    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(var(--page-padding-x), env(safe-area-inset-right));
+    padding-left: max(var(--page-padding-x), env(safe-area-inset-left));
     margin-bottom: 1.5rem;
     scroll-margin-top: 1.5rem;
   }

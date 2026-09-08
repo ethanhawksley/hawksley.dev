@@ -41,8 +41,8 @@ const isBlog = cleanPath.startsWith('/blog');
     align-items: center;
     justify-content: space-between;
     min-height: 3rem;
-    padding-right: max(1.5rem, env(safe-area-inset-right));
-    padding-left: max(1.5rem, env(safe-area-inset-left));
+    padding-right: max(var(--page-padding-x), env(safe-area-inset-right));
+    padding-left: max(var(--page-padding-x), env(safe-area-inset-left));
   }
 
   .logo {
