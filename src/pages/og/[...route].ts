@@ -11,7 +11,7 @@ import {
   getSortedSecondMaintainer,
 } from '../../utils/content-helpers';
 
-const VERSION = 'v7';
+export const VERSION = '7';
 const CACHE_DIR = path.join(process.cwd(), 'node_modules/.astro/og-cache');
 
 let bgBase64: string | null = null;
