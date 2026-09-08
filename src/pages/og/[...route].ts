@@ -7,6 +7,7 @@ import { Resvg } from '@resvg/resvg-js';
 import satori from 'satori';
 import sharp from 'sharp';
 
+import { OG_IMAGE_VERSION } from '../../utils/constants.ts';
 import {
   getSortedPosts,
   getSortedSecondMaintainer,
@@ -14,7 +15,6 @@ import {
 
 import type { APIRoute } from 'astro';
 
-export const VERSION = '7';
 const CACHE_DIR = path.join(process.cwd(), 'node_modules/.astro/og-cache');
 
 let bgBase64: string | null = null;
@@ -94,7 +94,7 @@ export const GET: APIRoute = async ({ props }) => {
   const { title, description = '', showCover = false } = page;
 
   const hash = createHash('sha256')
-    .update(VERSION)
+    .update(OG_IMAGE_VERSION)
     .update(title)
     .update(description)
     .update(showCover ? 'cover' : 'nocover')

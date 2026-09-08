@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import Misc from '../components/Misc.astro';
 import Navigation from '../components/Navigation.astro';
 
-import { VERSION } from '../pages/og/[...route]';
+import { OG_IMAGE_VERSION } from '../utils/constants.ts';
 
 interface Props {
   title: string;
@@ -171,7 +171,10 @@ const isIndexable = !robots.includes('noindex');
           <meta property="og:site_name" content="Ethan Hawksley" />
           <meta property="og:locale" content="en_GB" />
           <meta property="og:locale:alternate" content="en_US" />
-          <meta property="og:image" content={`${ogImage}?v=${VERSION}`} />
+          <meta
+            property="og:image"
+            content={`${ogImage}?v=${OG_IMAGE_VERSION}`}
+          />
           <meta property="og:image:alt" content={title} />
           <meta property="og:image:width" content={ogImageWidth.toString()} />
           <meta property="og:image:height" content={ogImageHeight.toString()} />
