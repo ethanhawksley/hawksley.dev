@@ -10,12 +10,24 @@ type Props = {
 const { src, alt, lcp, ...attrs } = Astro.props;
 
 const isDev = import.meta.env.DEV;
+const isStringSrc = typeof src === 'string';
+
+const standardWidths = [360, 720, 1080, 1440];
+const widths =
+  !isDev && !isStringSrc
+    ? [
+        ...standardWidths.filter((w) => w < src.width),
+        Math.min(src.width, 1440),
+      ].filter((w, i, arr) => arr.indexOf(w) === i)
+    : undefined;
 ---
 
 {
-  typeof src === 'string' ? (
+  isDev || isStringSrc ? (
     <img
-      src={src}
+      src={isStringSrc ? src : src.src}
+      width={isStringSrc ? undefined : src.width}
+      height={isStringSrc ? undefined : src.height}
       alt={alt}
       loading={lcp ? undefined : 'lazy'}
       fetchpriority={lcp ? 'high' : undefined}
@@ -26,8 +38,9 @@ const isDev = import.meta.env.DEV;
     <Picture
       src={src}
       alt={alt}
-      formats={isDev ? ['webp'] : ['avif', 'webp']}
-      fallbackFormat={isDev ? 'webp' : 'jpeg'}
+      widths={widths}
+      formats={['avif', 'webp']}
+      fallbackFormat="jpeg"
       sizes="(min-width: 768px) 720px, calc(100vw - 3rem)"
       loading={lcp ? 'eager' : 'lazy'}
       fetchpriority={lcp ? 'high' : undefined}
