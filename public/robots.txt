@@ -3,4 +3,3 @@ Allow: /
 Disallow: /cdn-cgi/
 
 Sitemap: https://hawksley.dev/sitemap.xml
-Sitemap: https://hawksley.dev/sitemap.txt
