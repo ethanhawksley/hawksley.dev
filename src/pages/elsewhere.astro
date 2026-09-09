@@ -2,14 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import A from '../components/A.astro';
 
-import { personJsonLd, websiteRef } from '../utils/jsonLd';
+import { personJsonLd, websiteJsonLd } from '../utils/jsonLd';
 import { profileSections } from '../utils/profiles';
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     personJsonLd,
-    websiteRef,
+    websiteJsonLd,
     {
       '@type': 'CollectionPage',
       '@id': 'https://hawksley.dev/elsewhere#webpage',

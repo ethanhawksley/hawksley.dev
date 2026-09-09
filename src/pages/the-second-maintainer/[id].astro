@@ -6,7 +6,7 @@ import A from '../../components/A.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 
 import { getSortedSecondMaintainer } from '../../utils/content-helpers';
-import { personJsonLd, websiteRef } from '../../utils/jsonLd';
+import { personJsonLd, websiteJsonLd } from '../../utils/jsonLd';
 
 import type { GetStaticPaths } from 'astro';
 
@@ -38,7 +38,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     personJsonLd,
-    websiteRef,
+    websiteJsonLd,
     {
       '@type': 'WebPage',
       '@id': `${chapterUrl}#webpage`,

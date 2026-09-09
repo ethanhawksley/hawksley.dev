@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import PostPreview from '../../components/PostPreview.astro';
 
 import { getReadingTime, getSortedPosts } from '../../utils/content-helpers';
-import { personJsonLd, websiteRef } from '../../utils/jsonLd';
+import { personJsonLd, websiteJsonLd } from '../../utils/jsonLd';
 
 const allPosts = await getSortedPosts();
 
@@ -11,7 +11,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     personJsonLd,
-    websiteRef,
+    websiteJsonLd,
     {
       '@type': 'CollectionPage',
       '@id': 'https://hawksley.dev/blog#webpage',

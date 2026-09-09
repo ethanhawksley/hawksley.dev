@@ -6,51 +6,23 @@ export const websiteJsonLd = {
   url: 'https://hawksley.dev/',
   name: 'Ethan Hawksley',
   alternateName: ['hawksley.dev', 'Hawksley'],
-  description:
-    'The personal site and blog of Ethan Hawksley, a Computer Science student in the UK with a focus on systems programming and cybersecurity.',
-  inLanguage: 'en',
-  publisher: { '@id': 'https://hawksley.dev/#person' },
-  image: {
-    '@type': 'ImageObject',
-    url: 'https://hawksley.dev/hawksley-dev-logo.png',
-    name: 'Logo of hawksley.dev',
-    caption: 'The official EH monogram logo for hawksley.dev',
-    width: 1024,
-    height: 1024,
-  },
 } as const;
 
 export const personJsonLd = {
   '@type': 'Person',
   '@id': 'https://hawksley.dev/#person',
   url: 'https://hawksley.dev/',
-  mainEntityOfPage: { '@id': 'https://hawksley.dev/#webpage' },
   name: 'Ethan Hawksley',
-  givenName: 'Ethan',
-  familyName: 'Hawksley',
   description:
-    'Computer Science student at the University of Warwick and author of The Second Maintainer, focusing on systems programming and cybersecurity.',
-  disambiguatingDescription:
-    'Computer Science student & systems/cybersecurity enthusiast, University of Warwick, UK',
-  jobTitle: 'Computer Science Student',
-  knowsLanguage: 'en',
-  knowsAbout: [
-    'Computer Science',
-    'Systems Programming',
-    'Cybersecurity',
-    'XZ Utils Backdoor',
-  ],
+    'Ethan Hawksley is a Computer Science student at the University of Warwick and author of The Second Maintainer: Inside the XZ Utils Backdoor.',
+  jobTitle: 'Author',
+  authorOf: {
+    '@id': 'https://hawksley.dev/the-second-maintainer#book',
+  },
   nationality: {
     '@type': 'Country',
     name: 'United Kingdom',
-  },
-  homeLocation: {
-    '@type': 'Place',
-    address: {
-      '@type': 'PostalAddress',
-      addressRegion: 'West Midlands',
-      addressCountry: 'GB',
-    },
+    sameAs: 'https://www.wikidata.org/wiki/Q145',
   },
   affiliation: {
     '@type': 'CollegeOrUniversity',
@@ -90,11 +62,4 @@ export const personJsonLd = {
     height: 1536,
   },
   sameAs: allProfileUrls,
-} as const;
-
-export const websiteRef = {
-  '@type': 'WebSite',
-  '@id': 'https://hawksley.dev/#website',
-  url: 'https://hawksley.dev/',
-  name: 'Ethan Hawksley',
 } as const;

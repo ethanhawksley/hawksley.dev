@@ -24,39 +24,6 @@ const ogImageUrl = new URL('/og/home.jpg', Astro.site).toString();
 
 const allProjects = await getSortedProjects();
 
-const projectJsonLds = allProjects.map((project) => {
-  if (project.data.type === 'Book') {
-    return {
-      '@type': 'Book',
-      '@id': 'https://hawksley.dev/the-second-maintainer#book',
-      url: 'https://hawksley.dev/the-second-maintainer',
-      name: project.data.name,
-      description: project.data.description,
-      author: { '@id': 'https://hawksley.dev/#person' },
-      publisher: { '@id': 'https://hawksley.dev/#person' },
-    };
-  }
-
-  const isWeb = project.data.type === 'Web';
-
-  return {
-    '@type': isWeb ? 'WebApplication' : 'SoftwareApplication',
-    '@id': project.data.id,
-    url: project.data.url,
-    name: project.data.name,
-    description: project.data.description,
-    applicationCategory: project.data.applicationCategory,
-    operatingSystem: 'Any',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'GBP',
-    },
-    creator: { '@id': 'https://hawksley.dev/#person' },
-    sameAs: project.data.links?.map((link) => link.url),
-  };
-});
-
 const allPosts = await getSortedPosts();
 const lastModified = allPosts[0].data.pubDate.toISOString();
 
@@ -84,7 +51,6 @@ const jsonLd = {
         height: 1536,
       },
     },
-    ...projectJsonLds,
   ],
 };
 ---
