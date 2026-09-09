@@ -19,7 +19,7 @@ const jsonLd = {
       isPartOf: { '@id': 'https://hawksley.dev/#website' },
       name: "Ethan Hawksley's Blog",
       description:
-        'A blog by Ethan Hawksley, a Computer Science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.',
+        'A blog by Ethan Hawksley, a computer science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.',
       inLanguage: 'en',
       mainEntity: { '@id': 'https://hawksley.dev/blog#blog' },
       primaryImageOfPage: {
@@ -38,7 +38,7 @@ const jsonLd = {
       mainEntityOfPage: { '@id': 'https://hawksley.dev/blog#webpage' },
       name: "Ethan Hawksley's Blog",
       description:
-        'A blog by Ethan Hawksley, a Computer Science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.',
+        'A blog by Ethan Hawksley, a computer science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.',
       inLanguage: 'en',
       publisher: { '@id': 'https://hawksley.dev/#person' },
       license: 'https://creativecommons.org/licenses/by/4.0/',
@@ -51,7 +51,7 @@ const ogImageUrl = new URL('/og/blog.jpg', Astro.site).toString();
 
 <Layout
   title="Blog | Ethan Hawksley"
-  description="A blog by Ethan Hawksley, a Computer Science student in the UK. Posts on systems programming, cybersecurity, and whatever else grabs my attention."
+  description="A blog by Ethan Hawksley, a computer science student in the UK. Posts on systems programming, cybersecurity, and whatever else grabs my attention."
   jsonLd={jsonLd}
   ogType="website"
   ogImage={ogImageUrl}

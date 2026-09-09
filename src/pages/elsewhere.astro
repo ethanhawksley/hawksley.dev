@@ -17,7 +17,7 @@ const jsonLd = {
       isPartOf: { '@id': 'https://hawksley.dev/#website' },
       name: 'Elsewhere',
       description:
-        'Online profiles of Ethan Hawksley, Computer Science student at the University of Warwick and author of The Second Maintainer.',
+        'Online profiles of Ethan Hawksley, computer science student at the University of Warwick and author of The Second Maintainer.',
       inLanguage: 'en',
       about: { '@id': 'https://hawksley.dev/#person' },
       primaryImageOfPage: {
@@ -37,7 +37,7 @@ const ogImageUrl = new URL('/og/elsewhere.jpg', Astro.site).toString();
 
 <Layout
   title="Elsewhere | Ethan Hawksley"
-  description="Online profiles of Ethan Hawksley, Computer Science student at the University of Warwick and author of The Second Maintainer."
+  description="Online profiles of Ethan Hawksley, computer science student at the University of Warwick and author of The Second Maintainer."
   jsonLd={jsonLd}
   ogType="website"
   ogImage={ogImageUrl}

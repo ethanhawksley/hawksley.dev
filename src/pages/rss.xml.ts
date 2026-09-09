@@ -15,7 +15,7 @@ export async function GET() {
 
   const title = "Ethan Hawksley's Blog";
   const description =
-    'A blog by Ethan Hawksley, a Computer Science student at the University of Warwick. Articles on systems programming, cybersecurity, and whatever else grabs my attention.';
+    'A blog by Ethan Hawksley, a computer science student at the University of Warwick. Articles on systems programming, cybersecurity, and whatever else grabs my attention.';
 
   const itemsXml = (
     await Promise.all(
