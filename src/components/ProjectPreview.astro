@@ -31,7 +31,7 @@ const { name, description, links = [], url, type, stack } = Astro.props;
     </h3>
     <p>{description}</p>
     <footer>
-      <span class="meta">
+      <div class="meta">
         <span class="type">{type}</span>
         {
           stack.length > 0 && (
@@ -42,16 +42,18 @@ const { name, description, links = [], url, type, stack } = Astro.props;
             </>
           )
         }
-      </span>
+      </div>
       {
-        links.map((link) => (
-          <span class="meta-action">
-            <A href={link.url} pressable>
-              <span class="sr-only">View {name} </span>
-              {link.name}
-            </A>
-          </span>
-        ))
+        links.length > 0 && (
+          <div class="meta-actions">
+            {links.map((link) => (
+              <A href={link.url} pressable>
+                <span class="sr-only">View {name} </span>
+                {link.name}
+              </A>
+            ))}
+          </div>
+        )
       }
     </footer>
   </article>
