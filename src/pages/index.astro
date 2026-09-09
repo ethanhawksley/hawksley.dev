@@ -91,7 +91,7 @@ const jsonLd = {
 
 <Layout
   title="Ethan Hawksley"
-  description="The personal site and blog of Ethan Hawksley, a Computer Science student at the University of Warwick and author of The Second Maintainer."
+  description="Ethan Hawksley is a Computer Science student at the University of Warwick and author of The Second Maintainer."
   jsonLd={jsonLd}
   ogType="website"
   ogImage={ogImageUrl}
@@ -100,13 +100,12 @@ const jsonLd = {
     <div class="hero-content">
       <h1>Ethan Hawksley</h1>
       <p class="hero-lead">
-        Ethan Hawksley is a Computer Science student at the University of
-        Warwick, focusing on both systems-level programming and cybersecurity.
-        He is also the author of <A href="/the-second-maintainer"
-          >The Second Maintainer</A
-        >.
+        I'm a Computer Science student at the University&nbsp;of&nbsp;Warwick
+        and the author of <A href="/the-second-maintainer"
+          >The&nbsp;Second&nbsp;Maintainer</A
+        >. I mainly focus on cybersecurity and performance, but I'm interested
+        in all sorts.
       </p>
-      <p class="hero-sub">That's me! I've built and written a few things.</p>
       <SocialLinks />
     </div>
     <picture>
@@ -158,7 +157,7 @@ const jsonLd = {
   }
 
   .hero p {
-    max-width: 37ch;
+    max-width: 30ch;
     text-wrap: balance;
   }
 
@@ -187,7 +186,13 @@ const jsonLd = {
     filter: none !important;
   }
 
-  @media (min-width: 41em) {
+  @media (min-width: 34em) {
+    .hero p {
+      max-width: 50ch;
+    }
+  }
+
+  @media (min-width: 46.25em) {
     .hero {
       flex-direction: row;
       gap: 0;
