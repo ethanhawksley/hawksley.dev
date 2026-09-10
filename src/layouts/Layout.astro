@@ -312,12 +312,6 @@ const isIndexable = !robots.includes('noindex');
     font-display: swap;
   }
 
-  @property --accent-mix {
-    syntax: '<percentage>';
-    inherits: false;
-    initial-value: 0%;
-  }
-
   :root {
     color-scheme: light dark;
 
@@ -517,13 +511,6 @@ const isIndexable = !robots.includes('noindex');
     cursor: pointer;
     background-color: transparent;
     border: 0;
-    transition:
-      --accent-mix 150ms ease-out,
-      transform 100ms ease-out;
-  }
-
-  button:active {
-    transform: scale(0.96);
   }
 
   ul[role='list'],

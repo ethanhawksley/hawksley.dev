@@ -46,6 +46,14 @@ const isBlog = cleanPath.startsWith('/blog');
     padding-left: max(var(--page-padding-x), env(safe-area-inset-left));
   }
 
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: var(--leading-tight);
+    text-decoration: none;
+  }
+
   .logo {
     width: 3rem;
     height: 3rem;
@@ -57,40 +65,29 @@ const isBlog = cleanPath.startsWith('/blog');
     gap: 1.5rem;
   }
 
-  a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: var(--leading-tight);
-    text-decoration: none;
-  }
-
   .page-links a {
     padding-right: 0.5rem;
     padding-left: 0.5rem;
     margin-right: -0.5rem;
     margin-left: -0.5rem;
     color: var(--color-text);
-    color: color-mix(
-      in oklch,
-      var(--color-accent) var(--accent-mix),
-      var(--color-text)
-    );
-    transition: --accent-mix 150ms ease-out;
+    transition:
+      color 150ms ease-out,
+      transform 100ms ease-out;
   }
 
-  .active {
+  .page-links a:hover {
+    color: var(--color-accent);
+  }
+
+  .page-links a:active {
+    transform: scale(0.96);
+  }
+
+  .page-links .active {
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 0.25em;
-    --accent-mix: 100%;
-  }
-
-  a:hover {
-    --accent-mix: 100%;
-  }
-
-  a:active {
-    transform: scale(0.96);
+    color: var(--color-accent);
   }
 </style>

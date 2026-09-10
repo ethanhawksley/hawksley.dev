@@ -46,22 +46,20 @@ const isExternalLink = external ?? isExternal(href);
 <style>
   a {
     color: var(--color-text);
-    color: color-mix(
-      in oklch,
-      var(--color-accent) var(--accent-mix),
-      var(--color-text)
-    );
     white-space: nowrap;
     text-decoration: none;
-    transition: --accent-mix 150ms ease-out;
+    transition: color 150ms ease-out;
   }
 
   a:hover {
-    --accent-mix: 100%;
+    color: var(--color-accent);
   }
 
   a[data-pressable] {
     display: inline-block;
+    transition:
+      color 150ms ease-out,
+      transform 100ms ease-out;
   }
 
   a[data-pressable]:active {

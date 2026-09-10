@@ -28,14 +28,9 @@ import Sun from '../assets/sun.svg';
     width: 2rem;
     height: 2rem;
     color: var(--color-text);
-    color: color-mix(
-      in oklch,
-      var(--color-accent) var(--accent-mix),
-      var(--color-text)
-    );
     transition:
       opacity 150ms ease-out,
-      --accent-mix 150ms ease-out;
+      color 150ms ease-out;
   }
 
   .sun {
@@ -53,7 +48,7 @@ import Sun from '../assets/sun.svg';
   @media (hover: hover) {
     button:hover > .sun,
     button:hover > .moon {
-      --accent-mix: 100%;
+      color: var(--color-accent);
     }
   }
 </style>

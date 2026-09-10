@@ -252,11 +252,11 @@ const jsonLd = {
   }
 
   .back-to-index :global(a) {
-    color: color-mix(
-      in oklch,
-      var(--color-accent) var(--accent-mix),
-      var(--color-text-muted)
-    );
+    color: var(--color-text-muted);
+  }
+
+  .back-to-index :global(a:hover) {
+    color: var(--color-accent);
   }
 
   .back-to-index .arrow {
@@ -305,17 +305,18 @@ const jsonLd = {
     flex-direction: column;
     gap: 0.3rem;
     color: var(--color-text);
-    color: color-mix(
-      in oklch,
-      var(--color-accent) var(--accent-mix),
-      var(--color-text)
-    );
     text-decoration: none;
-    transition: --accent-mix 150ms ease-out;
+    transition:
+      color 150ms ease-out,
+      transform 100ms ease-out;
+  }
+
+  .pager-link:hover {
+    color: var(--color-accent);
   }
 
   .pager-link:active {
-    transform: scale(0.96);
+    transform: scale(0.985);
   }
 
   .pager-link-label {
@@ -342,10 +343,6 @@ const jsonLd = {
 
   .pager-link-next .pager-link-title {
     text-align: right;
-  }
-
-  .pager-link:hover {
-    --accent-mix: 100%;
   }
 
   .pager-prev .pager-link:hover .arrow {
