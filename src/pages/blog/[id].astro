@@ -45,7 +45,6 @@ const jsonLd = {
       url: postUrl,
       isPartOf: { '@id': 'https://hawksley.dev/#website' },
       name: post.data.title,
-      inLanguage: 'en',
       mainEntity: { '@id': `${postUrl}#blogposting` },
       breadcrumb: { '@id': `${postUrl}#breadcrumb` },
       primaryImageOfPage: ogImageUrl,
@@ -55,7 +54,6 @@ const jsonLd = {
       '@id': 'https://hawksley.dev/blog#blog',
       url: 'https://hawksley.dev/blog',
       name: "Ethan Hawksley's Blog",
-      inLanguage: 'en',
       publisher: { '@id': 'https://hawksley.dev/#person' },
     },
     {
@@ -66,7 +64,6 @@ const jsonLd = {
       isPartOf: { '@id': 'https://hawksley.dev/blog#blog' },
       headline: post.data.title,
       description: post.data.metaDescription,
-      inLanguage: 'en',
       datePublished: post.data.pubDate.toISOString(),
       dateModified:
         post.data.modDate?.toISOString() ?? post.data.pubDate.toISOString(),

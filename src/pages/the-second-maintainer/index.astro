@@ -43,7 +43,6 @@ const jsonLd = {
       isPartOf: { '@id': 'https://hawksley.dev/#website' },
       name: 'The Second Maintainer',
       description,
-      inLanguage: 'en',
       mainEntity: { '@id': `${pageUrl}#book` },
       primaryImageOfPage: coverImageUrl,
     },
@@ -53,18 +52,10 @@ const jsonLd = {
       url: pageUrl,
       name: 'The Second Maintainer',
       description,
-      inLanguage: 'en',
       datePublished: '2026-09-02',
-      copyrightYear: 2026,
-      about: {
-        '@type': 'Thing',
-        name: 'XZ Utils backdoor',
-        sameAs: 'https://www.wikidata.org/wiki/Q125219704',
-      },
       author: { '@id': 'https://hawksley.dev/#person' },
       publisher: { '@id': 'https://hawksley.dev/#person' },
       license: 'https://creativecommons.org/licenses/by-sa/4.0/',
-      isAccessibleForFree: true,
       image: coverImageUrl,
       workExample: [
         {
@@ -74,6 +65,7 @@ const jsonLd = {
           bookEdition: 'Ebook',
           bookFormat: 'https://schema.org/EBook',
           inLanguage: 'en',
+          url: pageUrl,
           datePublished: '2026-09-02',
         },
         {
@@ -83,6 +75,7 @@ const jsonLd = {
           bookEdition: 'Paperback',
           bookFormat: 'https://schema.org/Paperback',
           inLanguage: 'en',
+          url: pageUrl,
           datePublished: '2026-09-02',
         },
       ],
