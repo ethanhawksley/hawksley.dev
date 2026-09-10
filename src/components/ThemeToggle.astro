@@ -47,7 +47,9 @@ import Sun from '../assets/sun.svg';
 
   @media (hover: hover) {
     button:hover > .sun,
-    button:hover > .moon {
+    button:hover > .moon,
+    button[data-hover] > .sun,
+    button[data-hover] > .moon {
       color: var(--color-accent);
     }
   }
@@ -68,7 +70,7 @@ import Sun from '../assets/sun.svg';
 
     updateAria(window.__getTheme());
 
-    const toggleTheme = () => {
+    const toggleTheme = (event: MouseEvent) => {
       if (document.documentElement.dataset.themeTransition) return;
 
       const currentTheme = window.__getTheme();
@@ -84,7 +86,39 @@ import Sun from '../assets/sun.svg';
         return;
       }
 
+      const isHovered = button.matches(':hover');
       document.documentElement.dataset.themeTransition = 'active';
+
+      let cursorController: AbortController | null = null;
+
+      if (isHovered) {
+        cursorController = new AbortController();
+        const rect = button.getBoundingClientRect();
+
+        const checkCursorBounds = (clientX: number, clientY: number) => {
+          const isInside =
+            clientX >= rect.left &&
+            clientX <= rect.right &&
+            clientY >= rect.top &&
+            clientY <= rect.bottom;
+
+          if (isInside) {
+            document.documentElement.style.setProperty('cursor', 'pointer');
+            button.dataset.hover = '';
+          } else {
+            document.documentElement.style.removeProperty('cursor');
+            delete button.dataset.hover;
+          }
+        };
+
+        checkCursorBounds(event.clientX, event.clientY);
+
+        window.addEventListener(
+          'pointermove',
+          (e) => checkCursorBounds(e.clientX, e.clientY),
+          { signal: cursorController.signal, passive: true },
+        );
+      }
 
       const transition = window.__themeTransition(() => {
         window.__setTheme(nextTheme, true);
@@ -92,6 +126,9 @@ import Sun from '../assets/sun.svg';
       });
 
       transition.finished.finally(() => {
+        cursorController?.abort();
+        document.documentElement.style.removeProperty('cursor');
+        delete button.dataset.hover;
         delete document.documentElement.dataset.themeTransition;
       });
     };
@@ -133,6 +170,8 @@ import Sun from '../assets/sun.svg';
     document.addEventListener(
       'astro:before-swap',
       () => {
+        document.documentElement.style.removeProperty('cursor');
+        delete button.dataset.hover;
         delete document.documentElement.dataset.themeTransition;
         controller.abort();
       },
