@@ -563,6 +563,7 @@ const isIndexable = !robots.includes('noindex');
     mix-blend-mode: normal;
     animation-duration: 300ms;
     animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation-fill-mode: forwards;
   }
 
   html[data-theme-transition='active']::view-transition-old(root) {
@@ -582,6 +583,12 @@ const isIndexable = !robots.includes('noindex');
     to {
       opacity: 1;
     }
+  }
+
+  html[data-no-transitions] *,
+  html[data-no-transitions] *::before,
+  html[data-no-transitions] *::after {
+    transition: none !important;
   }
 
   @media (prefers-reduced-motion: reduce) {

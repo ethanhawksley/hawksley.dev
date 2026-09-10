@@ -61,6 +61,18 @@ import Sun from '../assets/sun.svg';
   function initThemeToggle() {
     const button = document.getElementById('theme-toggle')!;
 
+    let activeTransition: {
+      skipTransition: any;
+      ready?: Promise<void>;
+      finished?: Promise<void>;
+      updateCallbackDone?: Promise<void>;
+    } | null = null;
+    let transitionController: AbortController | null = null;
+    let isReady = false;
+    let startTheme: 'light' | 'dark' = 'light';
+    let targetTheme: 'light' | 'dark' = 'dark';
+    let intendedTheme: 'light' | 'dark' = 'dark';
+
     const updateAria = (theme: 'light' | 'dark') => {
       button.setAttribute(
         'aria-label',
@@ -68,41 +80,104 @@ import Sun from '../assets/sun.svg';
       );
     };
 
+    const cleanupTransition = () => {
+      transitionController?.abort();
+      transitionController = null;
+      activeTransition = null;
+      isReady = false;
+      document.documentElement.style.removeProperty('cursor');
+      delete button.dataset.hover;
+      delete document.documentElement.dataset.themeTransition;
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          delete document.documentElement.dataset.noTransitions;
+        }),
+      );
+    };
+
     updateAria(window.__getTheme());
 
-    const toggleTheme = (event: MouseEvent) => {
-      if (document.documentElement.dataset.themeTransition) return;
+    const isInsideButton = (clientX: number, clientY: number) => {
+      const rect = button.getBoundingClientRect();
+      return (
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom
+      );
+    };
 
+    const getViewTransitionAnimations = () => {
+      return document.getAnimations().filter((anim) => {
+        const effect = anim.effect;
+        return (
+          effect &&
+          'pseudoElement' in effect &&
+          effect.pseudoElement === '::view-transition-new(root)'
+        );
+      });
+    };
+
+    const toggleTheme = () => {
       const currentTheme = window.__getTheme();
-      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      if (activeTransition) {
+        if (!isReady) {
+          activeTransition.skipTransition();
+          window.__setTheme(startTheme, true);
+          updateAria(startTheme);
+          cleanupTransition();
+          return;
+        }
+
+        const anims = getViewTransitionAnimations();
+        if (anims.length === 0) {
+          activeTransition.skipTransition();
+          window.__setTheme(startTheme, true);
+          updateAria(startTheme);
+          cleanupTransition();
+          return;
+        }
+
+        intendedTheme =
+          intendedTheme === targetTheme ? startTheme : targetTheme;
+        updateAria(intendedTheme);
+
+        anims.forEach((anim) => {
+          try {
+            anim.reverse();
+          } catch {}
+        });
+        return;
+      }
+
+      startTheme = currentTheme;
+      targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      intendedTheme = targetTheme;
 
       const prefersReducedMotion = matchMedia(
         '(prefers-reduced-motion: reduce)',
       ).matches;
 
       if (!window.__themeTransition || prefersReducedMotion) {
-        window.__setTheme(nextTheme, true);
-        updateAria(nextTheme);
+        window.__setTheme(targetTheme, true);
+        updateAria(targetTheme);
         return;
       }
 
       const isHovered = button.matches(':hover');
       document.documentElement.dataset.themeTransition = 'active';
+      document.documentElement.dataset.noTransitions = 'true';
 
-      let cursorController: AbortController | null = null;
+      transitionController = new AbortController();
+      const { signal } = transitionController;
 
       if (isHovered) {
-        cursorController = new AbortController();
-        const rect = button.getBoundingClientRect();
+        document.documentElement.style.setProperty('cursor', 'pointer');
+        button.dataset.hover = '';
 
         const checkCursorBounds = (clientX: number, clientY: number) => {
-          const isInside =
-            clientX >= rect.left &&
-            clientX <= rect.right &&
-            clientY >= rect.top &&
-            clientY <= rect.bottom;
-
-          if (isInside) {
+          if (isInsideButton(clientX, clientY)) {
             document.documentElement.style.setProperty('cursor', 'pointer');
             button.dataset.hover = '';
           } else {
@@ -111,26 +186,64 @@ import Sun from '../assets/sun.svg';
           }
         };
 
-        checkCursorBounds(event.clientX, event.clientY);
-
         window.addEventListener(
           'pointermove',
           (e) => checkCursorBounds(e.clientX, e.clientY),
-          { signal: cursorController.signal, passive: true },
+          { signal, passive: true },
         );
       }
 
+      window.addEventListener(
+        'pointerdown',
+        (e: PointerEvent) => {
+          if (e.button !== 0) return;
+          if (isInsideButton(e.clientX, e.clientY)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            toggleTheme();
+          }
+        },
+        { signal, capture: true },
+      );
+
+      isReady = false;
+
       const transition = window.__themeTransition(() => {
-        window.__setTheme(nextTheme, true);
-        updateAria(nextTheme);
+        window.__setTheme(targetTheme, true);
+        updateAria(targetTheme);
       });
 
-      transition.finished.finally(() => {
-        cursorController?.abort();
-        document.documentElement.style.removeProperty('cursor');
-        delete button.dataset.hover;
-        delete document.documentElement.dataset.themeTransition;
-      });
+      activeTransition = transition;
+
+      transition.ready
+        .then(() => {
+          if (activeTransition === transition) {
+            isReady = true;
+
+            const anims = getViewTransitionAnimations();
+            if (anims.length > 0) {
+              anims[0].finished
+                .catch(() => {})
+                .then(() => {
+                  if (activeTransition === transition) {
+                    if (intendedTheme === startTheme) {
+                      window.__setTheme(startTheme, true);
+                      activeTransition.skipTransition();
+                    }
+                  }
+                });
+            }
+          }
+        })
+        .catch(() => {});
+
+      transition.finished
+        .catch(() => {})
+        .finally(() => {
+          if (activeTransition === transition) {
+            cleanupTransition();
+          }
+        });
     };
 
     button.addEventListener('click', toggleTheme);
@@ -170,9 +283,8 @@ import Sun from '../assets/sun.svg';
     document.addEventListener(
       'astro:before-swap',
       () => {
-        document.documentElement.style.removeProperty('cursor');
-        delete button.dataset.hover;
-        delete document.documentElement.dataset.themeTransition;
+        activeTransition?.skipTransition();
+        cleanupTransition();
         controller.abort();
       },
       { once: true },
