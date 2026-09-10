@@ -3,7 +3,7 @@ title: 'JSON-LD explained for personal websites'
 description: 'Everything you need to know about JSON-LD and how to implement it.'
 metaDescription: 'A guide to implementing JSON-LD on your personal website for better SEO, covering WebSite, Person, BlogPosting, and more with ready-to-use code snippets.'
 pubDate: 2026-06-21
-modDate: 2026-08-26
+modDate: 2026-09-10
 ---
 
 JSON-LD, also known as JSON Linked Data, is a format for adding structured data to webpages. It can aid web crawlers in understanding the semantic structure of your site, qualifying you for richer link previews, and even potentially improving your search ranking.
@@ -89,20 +89,7 @@ You've seen an extract of `WebSite` earlier! Now here's the full version:
   "@id": "https://hawksley.dev/#website",
   "url": "https://hawksley.dev/",
   "name": "Ethan Hawksley",
-  "alternateName": ["hawksley.dev", "Hawksley"],
-  "description": "The personal site and blog of Ethan Hawksley, a computer science student in the UK with a focus on systems programming and cybersecurity.",
-  "inLanguage": "en",
-  "publisher": {
-    "@id": "https://hawksley.dev/#person"
-  },
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://hawksley.dev/hawksley-dev-logo.png",
-    "name": "Logo of hawksley.dev",
-    "caption": "The official EH monogram logo for hawksley.dev",
-    "width": 1024,
-    "height": 1024
-  }
+  "alternateName": ["hawksley.dev", "Hawksley"]
 }
 ```
 
@@ -112,18 +99,7 @@ You've seen an extract of `WebSite` earlier! Now here's the full version:
 
 Here, you can see that Google has interpreted the name field as representative of the domain and is labelling the result appropriately.
 
-Although `WebSite` applies to every page, you don't need to include the full version of it on every page. The root page of the domain should be fully detailed, but it is perfectly acceptable for other pages to have a slimmed-down version:
-
-```json
-{
-  "@type": "WebSite",
-  "@id": "https://hawksley.dev/#website",
-  "url": "https://hawksley.dev/",
-  "name": "Ethan Hawksley"
-}
-```
-
-This gives sufficient context to single-page crawlers so they correctly name the site, but they don't need the full details.
+Since other nodes will often reference `WebSite`, it's generally a good idea to include it on each page.
 
 ## WebPage
 
@@ -138,13 +114,13 @@ This gives sufficient context to single-page crawlers so they correctly name the
     "@id": "https://hawksley.dev/#website"
   },
   "name": "Winning the Hack Club Campfire Hackathon",
-  "inLanguage": "en",
   "mainEntity": {
     "@id": "https://hawksley.dev/blog/hack-club-campfire#blogposting"
   },
   "breadcrumb": {
     "@id": "https://hawksley.dev/blog/hack-club-campfire#breadcrumb"
-  }
+  },
+  "primaryImageOfPage": "https://hawksley.dev/og/blog/hack-club-campfire.jpg"
 }
 ```
 
@@ -165,64 +141,33 @@ Unlike `WebSite`, it is important enough context that you should include it on a
   "@id": "https://hawksley.dev/#person",
   "url": "https://hawksley.dev/",
   "name": "Ethan Hawksley",
-  "givenName": "Ethan",
-  "familyName": "Hawksley",
-  "description": "Long Description",
-  "disambiguatingDescription": "Shorter Description",
-  "jobTitle": "computer science Student",
-  "knowsLanguage": "en",
-  "knowsAbout": [
-    // Keywords
-  ],
+  "description": "Ethan Hawksley is a computer science student at the University of Warwick and author of The Second Maintainer: Inside the XZ Utils Backdoor.",
+  "jobTitle": "Author",
   "nationality": {
     "@type": "Country",
     "name": "United Kingdom"
-  },
-  "homeLocation": {
-    "@type": "Place",
-    "address": {
-      "@type": "PostalAddress",
-      "addressRegion": "West Midlands",
-      "addressCountry": "GB"
-    }
   },
   "affiliation": {
     "@type": "CollegeOrUniversity",
     "url": "https://warwick.ac.uk",
     "name": "University of Warwick",
-    "sameAs": [
-      "https://www.wikidata.org/wiki/Q865528",
-      "https://en.wikipedia.org/wiki/University_of_Warwick"
-    ]
+    "sameAs": "https://en.wikipedia.org/wiki/University_of_Warwick"
   },
   "alumniOf": [
     {
       "@type": "HighSchool",
       "url": "https://www.alcestergs.co.uk",
       "name": "Alcester Grammar School",
-      "sameAs": [
-        "https://www.wikidata.org/wiki/Q4713005",
-        "https://en.wikipedia.org/wiki/Alcester_Grammar_School"
-      ]
+      "sameAs": "https://en.wikipedia.org/wiki/Alcester_Grammar_School"
     },
     {
       "@type": "HighSchool",
       "url": "https://www.brookeweston.org",
       "name": "Brooke Weston Academy",
-      "sameAs": [
-        "https://www.wikidata.org/wiki/Q4974495",
-        "https://en.wikipedia.org/wiki/Brooke_Weston_Academy"
-      ]
+      "sameAs": "https://en.wikipedia.org/wiki/Brooke_Weston_Academy"
     }
   ],
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://hawksley.dev/ethan-hawksley.jpg",
-    "name": "Ethan Hawksley",
-    "caption": "Headshot of Ethan Hawksley, computer science student",
-    "width": 1536,
-    "height": 1536
-  },
+  "image": "https://hawksley.dev/ethan-hawksley.jpg",
   "sameAs": [
     "https://github.com/ethanhawksley",
     "https://www.linkedin.com/in/ethanhawksley",
@@ -238,7 +183,7 @@ Unlike `WebSite`, it is important enough context that you should include it on a
 Phew! There's plenty of properties for `Person`. I find that it helps to be more descriptive, rather than less, when it comes to filling it out. Let’s look at the most important properties:
 
 - `url` - Points to your root page, anchoring the node.
-- `name`, `givenName`, `familyName` - Clearly describes your name.
+- `name` - Clearly describes your name.
 - `image` - Preferably a photo of you, or a logo you are affiliated with. Connects you to a canonical image of you.
 - `sameAs` - Immensely useful for disambiguation, especially if you have a common name. It cleanly informs crawlers what your other profiles are, letting them build a knowledge graph representation of you across multiple pages. At the time of writing, [/g/11m62cgdtf](https://www.google.com/search?kgmid=/g/11m62cgdtf) is my Google knowledge graph ID.
 
@@ -251,51 +196,28 @@ A `ProfilePage`, as you may expect, describes a page on the site about a person.
 ```json
 {
   "@type": "ProfilePage",
-  "@id": "https://hawksley.dev#webpage",
+  "@id": "https://hawksley.dev/#webpage",
   "url": "https://hawksley.dev/",
   "isPartOf": {
     "@id": "https://hawksley.dev/#website"
   },
   "name": "About Ethan Hawksley",
-  "inLanguage": "en",
   "dateCreated": "2024-09-10T00:00:00.000Z",
   "dateModified": "2026-05-17T00:00:00.000Z",
   "mainEntity": {
     "@id": "https://hawksley.dev/#person"
-  }
+  },
+  "primaryImageOfPage": "https://hawksley.dev/ethan-hawksley.jpg"
 }
 ```
 
 It's important to use `isPartOf` to link it to your broader `WebSite` node, to create a relationship between the two nodes. The same applies for `mainEntity`, it lets crawlers know who the page is about. Including `dateCreated` and `dateModified` is a good freshness signal for crawlers, but if your site doesn't have them readily available, don't worry too much about it.
 
-## SoftwareApplication
-
-If you are showcasing any software on your page, it's a good idea to include a `SoftwareApplication` node to describe the metadata about it.
-
-```json
-{
-  "@type": "SoftwareApplication",
-  "@id": "https://hawksley.dev#app-yt-play",
-  "url": "https://crates.io/crates/yt-play",
-  "name": "yt-play",
-  "description": "A CLI utility written in Rust that synchronises YouTube playlists to local directories.",
-  "applicationCategory": "MultimediaApplication",
-  "creator": {
-    "@id": "https://hawksley.dev/#person"
-  },
-  "sameAs": ["https://github.com/ethanhawksley/yt-play"]
-}
-```
-
-If you want to be more specific than `SoftwareApplication`, other valid types for this node are `MobileApplication`, `WebApplication`, and `VideoGame`.
-
-The `url` property should be a link to where the project is deployed, e.g. crates.io. `sameAs` is for any other pages associated with the project, like its source code repository.
-
-There are lots of valid values for `applicationCategory`, you can find a list on [Google's definition for SoftwareApplication](https://developers.google.com/search/docs/appearance/structured-data/software-app).
-
 ## BreadcrumbList
 
-`BreadcrumbList` is widely useful and should be included on all pages aside from the root page. It is used to describe the categorisation of a page, which isn't necessarily the actual path to the page.
+`BreadcrumbList` is widely useful and should be included on all pages that are two layers deep in your hierarchy. For example, I include it on my blog posts (/blog/POST_ID), but not on my blog index (/blog), nor on my home page (/).
+
+A `BreadcrumbList` describes the conceptual path to a page, which does not necessarily have to match the path in the URL bar.
 
 ```json
 {
@@ -326,7 +248,7 @@ Here, the search result for my blog post contains the path `https://hawksley.dev
 
 ## CollectionPage
 
-The `CollectionPage` node is a subtype of `WebPage`, usable for pages that primarily contain lists. For example, my /elsewhere/ page lists all my other profiles, and /blog/ lists all my blog posts.
+The `CollectionPage` node is a subtype of `WebPage`, usable for pages that primarily contain lists. For example, my /elsewhere page lists all my other profiles, and /blog page lists all my blog posts.
 
 ```json
 {
@@ -337,22 +259,16 @@ The `CollectionPage` node is a subtype of `WebPage`, usable for pages that prima
     "@id": "https://hawksley.dev/#website"
   },
   "name": "Elsewhere",
-  "description": "Online profiles of Ethan Hawksley, a computer science student in the UK. Links to his development, social media, blogging, and security accounts.",
-  "inLanguage": "en",
-  "about": {
-    "@id": "https://hawksley.dev/#person"
-  },
-  "breadcrumb": {
-    "@id": "https://hawksley.dev/elsewhere#breadcrumb"
-  }
+  "description": "Online profiles of Ethan Hawksley, computer science student at the University of Warwick and author of The Second Maintainer.",
+  "primaryImageOfPage": "https://hawksley.dev/ethan-hawksley.jpg"
 }
 ```
 
-You've met most of these properties already, so they are largely self-explanatory. Make sure you link `breadcrumb` to the correct `BreadcrumbList`! It needs to be the one on the current page for it to make any sense.
+You've met most of these properties already, so they are largely self-explanatory.
 
 ## Blog
 
-You should add the `Blog` node to your blog's index or home page. It acts as a stepping stone between your `WebSite` and the individual blog posts you publish.
+You should add the `Blog` node to your blog's index, or your home page if you don't have an index. It acts as a stepping stone between your `WebSite` and the individual blog posts you publish.
 
 ```json
 {
@@ -366,8 +282,6 @@ You should add the `Blog` node to your blog's index or home page. It acts as a s
   },
   "name": "Ethan Hawksley's Blog",
   "description": "A blog by Ethan Hawksley, a computer science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.",
-  "inLanguage": "en",
-  "dateModified": "2026-05-17T00:00:00.000Z",
   "publisher": {
     "@id": "https://hawksley.dev/#person"
   },
@@ -398,9 +312,6 @@ The last node we'll be covering is `BlogPosting`. It should be included on all p
   },
   "headline": "The Need for Post-Quantum Cryptography",
   "description": "Quantum computers are closer to breaking RSA and ECC than we thought. Learn what post-quantum cryptography is and how to start migrating.",
-  "articleSection": "cybersecurity",
-  "keywords": "cybersecurity, quantum",
-  "inLanguage": "en",
   "datePublished": "2026-04-13T00:00:00.000Z",
   "dateModified": "2026-04-17T00:00:00.000Z",
   "author": {
@@ -409,12 +320,7 @@ The last node we'll be covering is `BlogPosting`. It should be included on all p
   "publisher": {
     "@id": "https://hawksley.dev/#person"
   },
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://hawksley.dev/og/blog/need-for-post-quantum-cryptography.jpg",
-    "width": 1200,
-    "height": 630
-  },
+  "image": "https://hawksley.dev/og/blog/need-for-post-quantum-cryptography.jpg",
   "license": "https://creativecommons.org/licenses/by/4.0/"
 }
 ```
