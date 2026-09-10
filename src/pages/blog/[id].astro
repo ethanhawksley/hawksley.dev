@@ -48,14 +48,7 @@ const jsonLd = {
       inLanguage: 'en',
       mainEntity: { '@id': `${postUrl}#blogposting` },
       breadcrumb: { '@id': `${postUrl}#breadcrumb` },
-      primaryImageOfPage: {
-        '@type': 'ImageObject',
-        url: ogImageUrl,
-        name: `${post.data.title} - Cover Image`,
-        caption: post.data.metaDescription,
-        width: 1200,
-        height: 630,
-      },
+      primaryImageOfPage: ogImageUrl,
     },
     {
       '@type': 'Blog',

@@ -16,9 +16,6 @@ export const personJsonLd = {
   description:
     'Ethan Hawksley is a computer science student at the University of Warwick and author of The Second Maintainer: Inside the XZ Utils Backdoor.',
   jobTitle: 'Author',
-  authorOf: {
-    '@id': 'https://hawksley.dev/the-second-maintainer#book',
-  },
   nationality: {
     '@type': 'Country',
     name: 'United Kingdom',
