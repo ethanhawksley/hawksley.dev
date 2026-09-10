@@ -75,22 +75,10 @@ import Sun from '../assets/sun.svg';
       );
     };
 
-    const cleanupTransition = () => {
-      transitionController?.abort();
-      transitionController = null;
-      activeTransition = null;
-      isReady = false;
-      document.documentElement.style.removeProperty('cursor');
-      delete button.dataset.hover;
-      delete document.documentElement.dataset.themeTransition;
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => {
-          delete document.documentElement.dataset.noTransitions;
-        }),
-      );
+    const setHover = (hovering: boolean) => {
+      document.documentElement.style.cursor = hovering ? 'pointer' : '';
+      button.toggleAttribute('data-hover', hovering);
     };
-
-    updateAria(window.__getTheme());
 
     const isInsideButton = (clientX: number, clientY: number) => {
       const rect = button.getBoundingClientRect();
@@ -113,19 +101,63 @@ import Sun from '../assets/sun.svg';
       });
     };
 
+    const cleanupTransition = () => {
+      transitionController?.abort();
+      transitionController = null;
+      activeTransition = null;
+      isReady = false;
+      setHover(false);
+      delete document.documentElement.dataset.themeTransition;
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          delete document.documentElement.dataset.noTransitions;
+        }),
+      );
+    };
+
+    const reverseAnimation = (anim: Animation) => {
+      const effect = anim.effect as KeyframeEffect | null;
+      if (!effect?.setKeyframes) {
+        anim.reverse();
+        return;
+      }
+
+      const style = getComputedStyle(
+        document.documentElement,
+        '::view-transition-new(root)',
+      );
+      const currentOpacity = Number.parseFloat(style.opacity) || 0.5;
+      const targetOpacity = intendedTheme === startTheme ? 0 : 1;
+      const distance = Math.abs(targetOpacity - currentOpacity);
+
+      effect.setKeyframes([
+        { opacity: currentOpacity },
+        { opacity: targetOpacity },
+      ]);
+      effect.updateTiming({
+        duration: Math.max(80, Math.round(distance * 300)),
+        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      });
+
+      anim.currentTime = 0;
+      anim.playbackRate = 1;
+      anim.play();
+
+      anim.finished
+        .catch(() => {})
+        .then(() => {
+          if (activeTransition && intendedTheme === startTheme) {
+            window.__setTheme(startTheme, true);
+            activeTransition.skipTransition();
+          }
+        });
+    };
+
     const toggleTheme = () => {
       const currentTheme = window.__getTheme();
 
       if (activeTransition) {
-        if (!isReady) {
-          activeTransition.skipTransition();
-          window.__setTheme(startTheme, true);
-          updateAria(startTheme);
-          cleanupTransition();
-          return;
-        }
-
-        const anims = getViewTransitionAnimations();
+        const anims = isReady ? getViewTransitionAnimations() : [];
         if (anims.length === 0) {
           activeTransition.skipTransition();
           window.__setTheme(startTheme, true);
@@ -137,12 +169,7 @@ import Sun from '../assets/sun.svg';
         intendedTheme =
           intendedTheme === targetTheme ? startTheme : targetTheme;
         updateAria(intendedTheme);
-
-        anims.forEach((anim) => {
-          try {
-            anim.reverse();
-          } catch {}
-        });
+        anims.forEach(reverseAnimation);
         return;
       }
 
@@ -168,22 +195,10 @@ import Sun from '../assets/sun.svg';
       const { signal } = transitionController;
 
       if (isHovered) {
-        document.documentElement.style.setProperty('cursor', 'pointer');
-        button.dataset.hover = '';
-
-        const checkCursorBounds = (clientX: number, clientY: number) => {
-          if (isInsideButton(clientX, clientY)) {
-            document.documentElement.style.setProperty('cursor', 'pointer');
-            button.dataset.hover = '';
-          } else {
-            document.documentElement.style.removeProperty('cursor');
-            delete button.dataset.hover;
-          }
-        };
-
+        setHover(true);
         window.addEventListener(
           'pointermove',
-          (e) => checkCursorBounds(e.clientX, e.clientY),
+          (e) => setHover(isInsideButton(e.clientX, e.clientY)),
           { signal, passive: true },
         );
       }
@@ -191,8 +206,7 @@ import Sun from '../assets/sun.svg';
       window.addEventListener(
         'pointerdown',
         (e: PointerEvent) => {
-          if (e.button !== 0) return;
-          if (isInsideButton(e.clientX, e.clientY)) {
+          if (e.button === 0 && isInsideButton(e.clientX, e.clientY)) {
             e.preventDefault();
             e.stopImmediatePropagation();
             toggleTheme();
@@ -212,23 +226,21 @@ import Sun from '../assets/sun.svg';
 
       transition.ready
         .then(() => {
-          if (activeTransition === transition) {
-            isReady = true;
+          if (activeTransition !== transition) return;
+          isReady = true;
 
-            const anims = getViewTransitionAnimations();
-            if (anims.length > 0) {
-              anims[0].finished
-                .catch(() => {})
-                .then(() => {
-                  if (activeTransition === transition) {
-                    if (intendedTheme === startTheme) {
-                      window.__setTheme(startTheme, true);
-                      activeTransition.skipTransition();
-                    }
-                  }
-                });
-            }
-          }
+          const anims = getViewTransitionAnimations();
+          anims[0]?.finished
+            .catch(() => {})
+            .then(() => {
+              if (
+                activeTransition === transition &&
+                intendedTheme === startTheme
+              ) {
+                window.__setTheme(startTheme, true);
+                activeTransition.skipTransition();
+              }
+            });
         })
         .catch(() => {});
 
@@ -243,16 +255,20 @@ import Sun from '../assets/sun.svg';
 
     button.addEventListener('click', toggleTheme);
 
+    const syncTheme = () => {
+      const theme = window.__getTheme();
+      window.__setTheme(theme, false);
+      updateAria(theme);
+    };
+
+    updateAria(window.__getTheme());
+
     const controller = new AbortController();
 
     window.addEventListener(
       'storage',
       (e) => {
-        if (e.key === 'theme') {
-          const theme = window.__getTheme();
-          window.__setTheme(theme, false);
-          updateAria(theme);
-        }
+        if (e.key === 'theme') syncTheme();
       },
       { signal: controller.signal },
     );
@@ -263,10 +279,7 @@ import Sun from '../assets/sun.svg';
         try {
           if (localStorage.getItem('theme') !== null) return;
         } catch {}
-
-        const theme = window.__getTheme();
-        window.__setTheme(theme, false);
-        updateAria(theme);
+        syncTheme();
       },
       { signal: controller.signal },
     );
