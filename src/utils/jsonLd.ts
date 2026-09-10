@@ -14,7 +14,7 @@ export const personJsonLd = {
   url: 'https://hawksley.dev/',
   name: 'Ethan Hawksley',
   description:
-    'Ethan Hawksley is a computer science student at the University of Warwick and author of The Second Maintainer: Inside the XZ Utils Backdoor.',
+    'Ethan Hawksley is a British computer science student at the University of Warwick and author of The Second Maintainer: Inside the XZ Utils Backdoor.',
   jobTitle: 'Author',
   nationality: {
     '@type': 'Country',
