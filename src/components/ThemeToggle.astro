@@ -61,12 +61,7 @@ import Sun from '../assets/sun.svg';
   function initThemeToggle() {
     const button = document.getElementById('theme-toggle')!;
 
-    let activeTransition: {
-      skipTransition: any;
-      ready?: Promise<void>;
-      finished?: Promise<void>;
-      updateCallbackDone?: Promise<void>;
-    } | null = null;
+    let activeTransition: ViewTransition | null = null;
     let transitionController: AbortController | null = null;
     let isReady = false;
     let startTheme: 'light' | 'dark' = 'light';
