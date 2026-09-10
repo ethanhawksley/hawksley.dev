@@ -50,13 +50,6 @@ export const personJsonLd = {
       ],
     },
   ],
-  image: {
-    '@type': 'ImageObject',
-    url: 'https://hawksley.dev/ethan-hawksley.jpg',
-    name: 'Ethan Hawksley',
-    caption: 'Ethan Hawksley',
-    width: 1536,
-    height: 1536,
-  },
+  image: 'https://hawksley.dev/ethan-hawksley.jpg',
   sameAs: allProfileUrls,
 } as const;
