@@ -249,11 +249,7 @@ import Sun from '../assets/sun.svg';
       'storage',
       (e) => {
         if (e.key === 'theme') {
-          const isDark =
-            e.newValue === 'dark' ||
-            (e.newValue === null && mediaQuery.matches);
-          const theme = isDark ? 'dark' : 'light';
-
+          const theme = window.__getTheme();
           window.__setTheme(theme, false);
           updateAria(theme);
         }
@@ -263,12 +259,12 @@ import Sun from '../assets/sun.svg';
 
     mediaQuery.addEventListener(
       'change',
-      (e) => {
+      () => {
         try {
           if (localStorage.getItem('theme') !== null) return;
         } catch {}
 
-        const theme = e.matches ? 'dark' : 'light';
+        const theme = window.__getTheme();
         window.__setTheme(theme, false);
         updateAria(theme);
       },
