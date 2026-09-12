@@ -60,6 +60,22 @@ const isIndexable = !robots.includes('noindex');
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
 
+    <title>{title}</title>
+
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ff4f00" media="not all" />
+    <meta
+      name="theme-color"
+      content="#fafafa"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0f0f0f"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta name="theme-color" content="#ff4f00" media="not all" />
+
     {
       preloadImage && (
         <link
@@ -87,21 +103,6 @@ const isIndexable = !robots.includes('noindex');
       fetchpriority={preloadImage ? undefined : 'high'}
       crossorigin
     />
-
-    <title>{title}</title>
-
-    <meta name="theme-color" content="#ff4f00" media="not all" />
-    <meta
-      name="theme-color"
-      content="#fafafa"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#0f0f0f"
-      media="(prefers-color-scheme: dark)"
-    />
-    <meta name="theme-color" content="#ff4f00" media="not all" />
 
     <script is:inline>
       window.__getTheme = () => {
@@ -152,13 +153,17 @@ const isIndexable = !robots.includes('noindex');
         document.startViewTransition = undefined;
       }
 
+      document.addEventListener('astro:before-swap', (event) => {
+        window.__setTheme(window.__getTheme(), false, event.newDocument);
+        event.newDocument.documentElement.classList.add('js');
+      });
+
       document.documentElement.classList.add('js');
     </script>
 
     <meta name="description" content={description} />
     <meta name="robots" content={robots} />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="color-scheme" content="light dark" />
 
     {
       isIndexable && (
@@ -235,14 +240,7 @@ const isIndexable = !robots.includes('noindex');
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    {
-      isHome && (
-        <>
-          <link rel="me" href="https://github.com/ethanhawksley" />
-          <link rel="me" href="https://mastodon.social/@ethanhawksley" />
-        </>
-      )
-    }
+    {isHome && <link rel="me" href="https://mastodon.social/@ethanhawksley" />}
 
     {
       jsonLd && (
@@ -283,14 +281,14 @@ const isIndexable = !robots.includes('noindex');
       </main>
       <Footer />
     </div>
-    <div id="a11y-status-announce" class="sr-only" aria-live="polite"></div>
-
-    <script>
-      document.addEventListener('astro:before-swap', (event) => {
-        window.__setTheme(window.__getTheme(), false, event.newDocument);
-        event.newDocument.documentElement.classList.add('js');
-      });
-    </script>
+    <div
+      id="announcer"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+    </div>
     <Misc />
   </body>
 </html>

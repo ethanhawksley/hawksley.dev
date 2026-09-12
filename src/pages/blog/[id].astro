@@ -608,6 +608,22 @@ const jsonLd = {
     HTMLButtonElement,
     ReturnType<typeof setTimeout>
   >();
+  let announcerTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  function announce(message: string) {
+    const liveRegion = document.getElementById('announcer');
+    if (!liveRegion) return;
+
+    if (announcerTimeout) clearTimeout(announcerTimeout);
+
+    const current = liveRegion.textContent;
+    liveRegion.textContent = current === message ? message + '\u00A0' : message;
+
+    announcerTimeout = setTimeout(() => {
+      liveRegion.textContent = '';
+      announcerTimeout = null;
+    }, 4000);
+  }
 
   function initCopyButtons() {
     const controller = new AbortController();
@@ -627,14 +643,15 @@ const jsonLd = {
         if (!code) return;
 
         try {
+          if (!navigator.clipboard?.writeText) return;
           await navigator.clipboard.writeText(code);
         } catch {
           return;
         }
 
-        button.dataset.copied = '';
-        const liveRegion = document.getElementById('a11y-status-announce')!;
-        liveRegion.textContent = 'Code copied to clipboard';
+        announce('Code copied to clipboard');
+
+        button.dataset.copied = 'true';
 
         const prev = timeouts.get(button);
         if (prev) clearTimeout(prev);
@@ -643,16 +660,20 @@ const jsonLd = {
           button,
           setTimeout(() => {
             delete button.dataset.copied;
-            liveRegion.textContent = '';
           }, 2000),
         );
       },
       { signal: controller.signal },
     );
 
-    document.addEventListener('astro:before-swap', () => controller.abort(), {
-      once: true,
-    });
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        if (announcerTimeout) clearTimeout(announcerTimeout);
+        controller.abort();
+      },
+      { once: true },
+    );
   }
 
   document.addEventListener('astro:page-load', initCopyButtons);
