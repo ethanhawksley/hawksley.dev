@@ -59,14 +59,33 @@ import Sun from '../assets/sun.svg';
   const mediaQuery = matchMedia('(prefers-color-scheme: dark)');
 
   let button: HTMLElement | null = null;
+
   let activeTransition: ViewTransition | null = null;
   let transitionController: AbortController | null = null;
+
   let isReady = false;
+
   let startTheme: 'light' | 'dark' = 'light';
   let targetTheme: 'light' | 'dark' = 'dark';
   let intendedTheme: 'light' | 'dark' = 'dark';
+
   let isPressed = false;
+
   let pendingCleanup = false;
+
+  let noTransitionsRaf1: number | null = null;
+  let noTransitionsRaf2: number | null = null;
+
+  function cancelNoTransitionsCleanup() {
+    if (noTransitionsRaf1 !== null) {
+      cancelAnimationFrame(noTransitionsRaf1);
+      noTransitionsRaf1 = null;
+    }
+    if (noTransitionsRaf2 !== null) {
+      cancelAnimationFrame(noTransitionsRaf2);
+      noTransitionsRaf2 = null;
+    }
+  }
 
   function updateAria(theme: 'light' | 'dark') {
     button?.setAttribute(
@@ -111,11 +130,20 @@ import Sun from '../assets/sun.svg';
     isReady = false;
     setHover(false);
     delete document.documentElement.dataset.themeTransition;
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        delete document.documentElement.dataset.noTransitions;
-      }),
-    );
+
+    cancelNoTransitionsCleanup();
+    noTransitionsRaf1 = requestAnimationFrame(() => {
+      noTransitionsRaf1 = null;
+      noTransitionsRaf2 = requestAnimationFrame(() => {
+        noTransitionsRaf2 = null;
+        if (
+          !activeTransition &&
+          !document.documentElement.dataset.themeTransition
+        ) {
+          delete document.documentElement.dataset.noTransitions;
+        }
+      });
+    });
   }
 
   function reverseAnimation(anim: Animation) {
@@ -187,6 +215,8 @@ import Sun from '../assets/sun.svg';
       updateAria(targetTheme);
       return;
     }
+
+    cancelNoTransitionsCleanup();
 
     const isHovered = button?.matches(':hover') ?? false;
     document.documentElement.dataset.themeTransition = 'active';
@@ -324,6 +354,7 @@ import Sun from '../assets/sun.svg';
     document.addEventListener(
       'astro:before-swap',
       () => {
+        cancelNoTransitionsCleanup();
         activeTransition?.skipTransition();
         cleanupTransition();
         controller.abort();
