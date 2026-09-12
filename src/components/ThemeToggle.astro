@@ -209,6 +209,7 @@ import Sun from '../assets/sun.svg';
       'pointerdown',
       (e: PointerEvent) => {
         if (e.button === 0 && isInsideButton(e.clientX, e.clientY)) {
+          e.preventDefault();
           isPressed = true;
           setHover(true);
         }
