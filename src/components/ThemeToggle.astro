@@ -65,6 +65,8 @@ import Sun from '../assets/sun.svg';
   let startTheme: 'light' | 'dark' = 'light';
   let targetTheme: 'light' | 'dark' = 'dark';
   let intendedTheme: 'light' | 'dark' = 'dark';
+  let isPressed = false;
+  let pendingCleanup = false;
 
   function updateAria(theme: 'light' | 'dark') {
     button?.setAttribute(
@@ -97,6 +99,12 @@ import Sun from '../assets/sun.svg';
   }
 
   function cleanupTransition() {
+    if (isPressed) {
+      pendingCleanup = true;
+      return;
+    }
+
+    pendingCleanup = false;
     transitionController?.abort();
     transitionController = null;
     activeTransition = null;
@@ -157,7 +165,12 @@ import Sun from '../assets/sun.svg';
 
       if (isReady) {
         const anims = getViewTransitionAnimations();
-        anims.forEach(reverseAnimation);
+        if (anims.length > 0) {
+          anims.forEach(reverseAnimation);
+        } else {
+          window.__setTheme(intendedTheme, true);
+          activeTransition.skipTransition();
+        }
       }
       return;
     }
@@ -185,20 +198,51 @@ import Sun from '../assets/sun.svg';
 
     if (isHovered) {
       setHover(true);
-      window.addEventListener(
-        'pointermove',
-        (e) => setHover(isInsideButton(e.clientX, e.clientY)),
-        { signal, passive: true },
-      );
     }
+
+    window.addEventListener(
+      'pointermove',
+      (e) => setHover(isInsideButton(e.clientX, e.clientY)),
+      { signal, passive: true },
+    );
 
     window.addEventListener(
       'pointerdown',
       (e: PointerEvent) => {
         if (e.button === 0 && isInsideButton(e.clientX, e.clientY)) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          toggleTheme();
+          isPressed = true;
+          setHover(true);
+        }
+      },
+      { signal, capture: true },
+    );
+
+    window.addEventListener(
+      'pointerup',
+      (e: PointerEvent) => {
+        if (isPressed) {
+          isPressed = false;
+
+          const wasPending = pendingCleanup;
+          pendingCleanup = false;
+          if (wasPending) {
+            cleanupTransition();
+          }
+
+          if (e.button === 0 && isInsideButton(e.clientX, e.clientY)) {
+            toggleTheme();
+          }
+        }
+      },
+      { signal, capture: true },
+    );
+
+    window.addEventListener(
+      'pointercancel',
+      () => {
+        isPressed = false;
+        if (pendingCleanup) {
+          cleanupTransition();
         }
       },
       { signal, capture: true },
@@ -250,6 +294,7 @@ import Sun from '../assets/sun.svg';
         if (activeTransition === transition) {
           window.__setTheme(intendedTheme, true);
           updateAria(intendedTheme);
+          activeTransition = null;
           cleanupTransition();
         }
       });
