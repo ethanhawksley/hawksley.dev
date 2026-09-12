@@ -58,219 +58,225 @@ import Sun from '../assets/sun.svg';
 <script>
   const mediaQuery = matchMedia('(prefers-color-scheme: dark)');
 
-  function initThemeToggle() {
-    const button = document.getElementById('theme-toggle')!;
+  let button: HTMLElement | null = null;
+  let activeTransition: ViewTransition | null = null;
+  let transitionController: AbortController | null = null;
+  let isReady = false;
+  let startTheme: 'light' | 'dark' = 'light';
+  let targetTheme: 'light' | 'dark' = 'dark';
+  let intendedTheme: 'light' | 'dark' = 'dark';
 
-    let activeTransition: ViewTransition | null = null;
-    let transitionController: AbortController | null = null;
-    let isReady = false;
-    let startTheme: 'light' | 'dark' = 'light';
-    let targetTheme: 'light' | 'dark' = 'dark';
-    let intendedTheme: 'light' | 'dark' = 'dark';
+  function updateAria(theme: 'light' | 'dark') {
+    button?.setAttribute(
+      'aria-label',
+      theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme',
+    );
+  }
 
-    const updateAria = (theme: 'light' | 'dark') => {
-      button.setAttribute(
-        'aria-label',
-        theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme',
+  function setHover(hovering: boolean) {
+    document.documentElement.style.cursor = hovering ? 'pointer' : '';
+    button?.toggleAttribute('data-hover', hovering);
+  }
+
+  function isInsideButton(clientX: number, clientY: number) {
+    if (!button) return false;
+    const { left, right, top, bottom } = button.getBoundingClientRect();
+    return (
+      clientX >= left && clientX <= right && clientY >= top && clientY <= bottom
+    );
+  }
+
+  function getViewTransitionAnimations() {
+    return document
+      .getAnimations()
+      .filter(
+        (anim) =>
+          (anim.effect as KeyframeEffect | null)?.pseudoElement ===
+          '::view-transition-new(root)',
       );
-    };
+  }
 
-    const setHover = (hovering: boolean) => {
-      document.documentElement.style.cursor = hovering ? 'pointer' : '';
-      button.toggleAttribute('data-hover', hovering);
-    };
+  function cleanupTransition() {
+    transitionController?.abort();
+    transitionController = null;
+    activeTransition = null;
+    isReady = false;
+    setHover(false);
+    delete document.documentElement.dataset.themeTransition;
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        delete document.documentElement.dataset.noTransitions;
+      }),
+    );
+  }
 
-    const isInsideButton = (clientX: number, clientY: number) => {
-      const rect = button.getBoundingClientRect();
-      return (
-        clientX >= rect.left &&
-        clientX <= rect.right &&
-        clientY >= rect.top &&
-        clientY <= rect.bottom
-      );
-    };
+  function reverseAnimation(anim: Animation) {
+    const effect = anim.effect as KeyframeEffect | null;
+    if (!effect?.setKeyframes) {
+      anim.reverse();
+      return;
+    }
 
-    const getViewTransitionAnimations = () => {
-      return document.getAnimations().filter((anim) => {
-        const effect = anim.effect;
-        return (
-          effect &&
-          'pseudoElement' in effect &&
-          effect.pseudoElement === '::view-transition-new(root)'
-        );
-      });
-    };
+    const style = getComputedStyle(
+      document.documentElement,
+      '::view-transition-new(root)',
+    );
+    const currentOpacity = Number.parseFloat(style.opacity) || 0.5;
+    const targetOpacity = intendedTheme === startTheme ? 0 : 1;
+    const distance = Math.abs(targetOpacity - currentOpacity);
 
-    const cleanupTransition = () => {
-      transitionController?.abort();
-      transitionController = null;
-      activeTransition = null;
-      isReady = false;
-      setHover(false);
-      delete document.documentElement.dataset.themeTransition;
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => {
-          delete document.documentElement.dataset.noTransitions;
-        }),
-      );
-    };
+    effect.setKeyframes([
+      { opacity: currentOpacity },
+      { opacity: targetOpacity },
+    ]);
+    effect.updateTiming({
+      duration: Math.max(80, Math.round(distance * 300)),
+      easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    });
 
-    const reverseAnimation = (anim: Animation) => {
-      const effect = anim.effect as KeyframeEffect | null;
-      if (!effect?.setKeyframes) {
-        anim.reverse();
-        return;
+    anim.currentTime = 0;
+    anim.playbackRate = 1;
+    anim.play();
+
+    anim.finished
+      .then(() => {
+        if (activeTransition && intendedTheme === startTheme) {
+          window.__setTheme(startTheme, true);
+          activeTransition.skipTransition();
+        }
+      })
+      .catch(() => {});
+  }
+
+  function toggleTheme() {
+    const currentTheme = window.__getTheme();
+
+    if (activeTransition) {
+      intendedTheme = intendedTheme === targetTheme ? startTheme : targetTheme;
+      updateAria(intendedTheme);
+
+      if (isReady) {
+        const anims = getViewTransitionAnimations();
+        anims.forEach(reverseAnimation);
       }
+      return;
+    }
 
-      const style = getComputedStyle(
-        document.documentElement,
-        '::view-transition-new(root)',
+    startTheme = currentTheme;
+    targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    intendedTheme = targetTheme;
+
+    const prefersReducedMotion = matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    if (!window.__themeTransition || prefersReducedMotion) {
+      window.__setTheme(targetTheme, true);
+      updateAria(targetTheme);
+      return;
+    }
+
+    const isHovered = button?.matches(':hover') ?? false;
+    document.documentElement.dataset.themeTransition = 'active';
+    document.documentElement.dataset.noTransitions = 'true';
+
+    transitionController = new AbortController();
+    const { signal } = transitionController;
+
+    if (isHovered) {
+      setHover(true);
+      window.addEventListener(
+        'pointermove',
+        (e) => setHover(isInsideButton(e.clientX, e.clientY)),
+        { signal, passive: true },
       );
-      const currentOpacity = Number.parseFloat(style.opacity) || 0.5;
-      const targetOpacity = intendedTheme === startTheme ? 0 : 1;
-      const distance = Math.abs(targetOpacity - currentOpacity);
+    }
 
-      effect.setKeyframes([
-        { opacity: currentOpacity },
-        { opacity: targetOpacity },
-      ]);
-      effect.updateTiming({
-        duration: Math.max(80, Math.round(distance * 300)),
-        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-      });
+    window.addEventListener(
+      'pointerdown',
+      (e: PointerEvent) => {
+        if (e.button === 0 && isInsideButton(e.clientX, e.clientY)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          toggleTheme();
+        }
+      },
+      { signal, capture: true },
+    );
 
-      anim.currentTime = 0;
-      anim.playbackRate = 1;
-      anim.play();
+    isReady = false;
 
-      anim.finished
-        .catch(() => {})
-        .then(() => {
-          if (activeTransition && intendedTheme === startTheme) {
+    const transition = window.__themeTransition(() => {
+      window.__setTheme(targetTheme, true);
+      updateAria(targetTheme);
+    });
+
+    activeTransition = transition;
+
+    transition.ready
+      .then(() => {
+        if (activeTransition !== transition) return;
+        isReady = true;
+
+        const anims = getViewTransitionAnimations();
+
+        if (intendedTheme === startTheme) {
+          if (anims.length > 0) {
+            anims.forEach(reverseAnimation);
+          } else {
             window.__setTheme(startTheme, true);
             activeTransition.skipTransition();
           }
-        });
-    };
-
-    const toggleTheme = () => {
-      const currentTheme = window.__getTheme();
-
-      if (activeTransition) {
-        const anims = isReady ? getViewTransitionAnimations() : [];
-        if (anims.length === 0) {
-          activeTransition.skipTransition();
-          window.__setTheme(startTheme, true);
-          updateAria(startTheme);
-          cleanupTransition();
           return;
         }
 
-        intendedTheme =
-          intendedTheme === targetTheme ? startTheme : targetTheme;
-        updateAria(intendedTheme);
-        anims.forEach(reverseAnimation);
-        return;
-      }
+        anims[0]?.finished
+          .then(() => {
+            if (
+              activeTransition === transition &&
+              intendedTheme === startTheme
+            ) {
+              window.__setTheme(startTheme, true);
+              activeTransition.skipTransition();
+            }
+          })
+          .catch(() => {});
+      })
+      .catch(() => {});
 
-      startTheme = currentTheme;
-      targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      intendedTheme = targetTheme;
-
-      const prefersReducedMotion = matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-
-      if (!window.__themeTransition || prefersReducedMotion) {
-        window.__setTheme(targetTheme, true);
-        updateAria(targetTheme);
-        return;
-      }
-
-      const isHovered = button.matches(':hover');
-      document.documentElement.dataset.themeTransition = 'active';
-      document.documentElement.dataset.noTransitions = 'true';
-
-      transitionController = new AbortController();
-      const { signal } = transitionController;
-
-      if (isHovered) {
-        setHover(true);
-        window.addEventListener(
-          'pointermove',
-          (e) => setHover(isInsideButton(e.clientX, e.clientY)),
-          { signal, passive: true },
-        );
-      }
-
-      window.addEventListener(
-        'pointerdown',
-        (e: PointerEvent) => {
-          if (e.button === 0 && isInsideButton(e.clientX, e.clientY)) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            toggleTheme();
-          }
-        },
-        { signal, capture: true },
-      );
-
-      isReady = false;
-
-      const transition = window.__themeTransition(() => {
-        window.__setTheme(targetTheme, true);
-        updateAria(targetTheme);
+    transition.finished
+      .catch(() => {})
+      .finally(() => {
+        if (activeTransition === transition) {
+          window.__setTheme(intendedTheme, true);
+          updateAria(intendedTheme);
+          cleanupTransition();
+        }
       });
+  }
 
-      activeTransition = transition;
+  function syncTheme() {
+    const theme = window.__getTheme();
+    window.__setTheme(theme, false);
+    updateAria(theme);
+  }
 
-      transition.ready
-        .then(() => {
-          if (activeTransition !== transition) return;
-          isReady = true;
-
-          const anims = getViewTransitionAnimations();
-          anims[0]?.finished
-            .catch(() => {})
-            .then(() => {
-              if (
-                activeTransition === transition &&
-                intendedTheme === startTheme
-              ) {
-                window.__setTheme(startTheme, true);
-                activeTransition.skipTransition();
-              }
-            });
-        })
-        .catch(() => {});
-
-      transition.finished
-        .catch(() => {})
-        .finally(() => {
-          if (activeTransition === transition) {
-            cleanupTransition();
-          }
-        });
-    };
+  function initThemeToggle() {
+    button = document.getElementById('theme-toggle');
+    if (!button) return;
 
     button.addEventListener('click', toggleTheme);
-
-    const syncTheme = () => {
-      const theme = window.__getTheme();
-      window.__setTheme(theme, false);
-      updateAria(theme);
-    };
-
     updateAria(window.__getTheme());
 
     const controller = new AbortController();
+    const { signal } = controller;
 
     window.addEventListener(
       'storage',
       (e) => {
         if (e.key === 'theme') syncTheme();
       },
-      { signal: controller.signal },
+      { signal },
     );
 
     mediaQuery.addEventListener(
@@ -281,7 +287,7 @@ import Sun from '../assets/sun.svg';
         } catch {}
         syncTheme();
       },
-      { signal: controller.signal },
+      { signal },
     );
 
     document.addEventListener(
