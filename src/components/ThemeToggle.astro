@@ -149,7 +149,6 @@ import Sun from '../assets/sun.svg';
     anim.finished
       .then(() => {
         if (activeTransition && intendedTheme === startTheme) {
-          window.__setTheme(startTheme, true);
           activeTransition.skipTransition();
         }
       })
@@ -262,29 +261,15 @@ import Sun from '../assets/sun.svg';
         if (activeTransition !== transition) return;
         isReady = true;
 
-        const anims = getViewTransitionAnimations();
-
         if (intendedTheme === startTheme) {
+          const anims = getViewTransitionAnimations();
           if (anims.length > 0) {
             anims.forEach(reverseAnimation);
           } else {
             window.__setTheme(startTheme, true);
             activeTransition.skipTransition();
           }
-          return;
         }
-
-        anims[0]?.finished
-          .then(() => {
-            if (
-              activeTransition === transition &&
-              intendedTheme === startTheme
-            ) {
-              window.__setTheme(startTheme, true);
-              activeTransition.skipTransition();
-            }
-          })
-          .catch(() => {});
       })
       .catch(() => {});
 
