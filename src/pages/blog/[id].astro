@@ -416,10 +416,16 @@ const jsonLd = {
       display: none !important;
     }
 
+    .prose a {
+      white-space: normal !important;
+    }
+
     .prose a[href^='http']::after {
+      font-family: var(--font-mono);
       font-size: var(--font-size-sm);
       color: var(--color-text-muted);
       word-break: break-all;
+      overflow-wrap: anywhere;
       content: ' (' attr(href) ')';
     }
 
