@@ -405,6 +405,7 @@ const isIndexable = !robots.includes('noindex');
 
   html {
     scrollbar-gutter: stable;
+    -webkit-tap-highlight-color: transparent;
     font-family: var(--font-sans);
     color: var(--color-text);
     accent-color: var(--color-accent);
@@ -491,11 +492,6 @@ const isIndexable = !robots.includes('noindex');
   img:hover,
   img:focus {
     filter: none;
-  }
-
-  a,
-  button {
-    -webkit-tap-highlight-color: transparent;
   }
 
   a svg,
