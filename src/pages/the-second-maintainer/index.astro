@@ -21,9 +21,6 @@ const inlineImagePath = path.join(
 const inlineImageBuffer = fs.readFileSync(inlineImagePath);
 const inlineImageBase64 = `data:image/avif;base64,${inlineImageBuffer.toString('base64')}`;
 
-const ogImageUrl =
-  'https://hawksley.dev/the-second-maintainer/the-second-maintainer.jpg';
-
 const pageUrl = 'https://hawksley.dev/the-second-maintainer';
 const coverImageUrl =
   'https://hawksley.dev/the-second-maintainer/the-second-maintainer.jpg';
@@ -82,6 +79,11 @@ const jsonLd = {
     },
   ],
 };
+
+const ogImageUrl = new URL(
+  '/og/the-second-maintainer.jpg',
+  Astro.site,
+).toString();
 ---
 
 <Layout
@@ -90,9 +92,6 @@ const jsonLd = {
   jsonLd={jsonLd}
   ogType="website"
   ogImage={ogImageUrl}
-  ogImageWidth={1600}
-  ogImageHeight={2560}
-  twitterCard="summary"
 >
   <section class="hero">
     <div class="hero-content">

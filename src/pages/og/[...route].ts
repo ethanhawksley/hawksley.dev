@@ -84,6 +84,17 @@ export async function getStaticPaths() {
         },
       },
     },
+    {
+      params: { route: 'the-second-maintainer.jpg' },
+      props: {
+        page: {
+          title: 'The Second Maintainer',
+          description:
+            'A non-fiction book on the XZ Utils backdoor. Read free online or download.',
+          showCover: true,
+        },
+      },
+    },
   ];
 
   return [...staticPaths, ...blogPaths, ...chapterPaths];
