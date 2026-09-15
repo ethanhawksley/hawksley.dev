@@ -25,5 +25,3 @@ pnpm-debug.log*
 
 # git commit sha tracker
 public/version.txt
-
-src/content/blog/draft*
