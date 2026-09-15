@@ -51,6 +51,10 @@ export const profileSections = [
         name: 'Bold.pro',
         url: 'https://bold.pro/my/ethanhawksley',
       },
+      {
+        name: 'Wikidata',
+        url: 'https://www.wikidata.org/wiki/Q141459330',
+      },
     ],
   },
   {
