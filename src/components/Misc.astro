@@ -15,12 +15,14 @@
       } else {
         pageHistory.push(window.location.href);
       }
+
       if (pageHistory.length === 16) {
         pageHistory = [];
         console.log('* (Well, there is a man here.)');
         console.log('* (He offered you something.)');
         console.log('yes   no');
-        function setupResponse(option: string, reply: string) {
+
+        function setupResponse(option, reply) {
           Object.defineProperty(window, option, {
             get() {
               if (hasChosen) {
@@ -39,198 +41,183 @@
     }
   });
 
-  const goatcounter = {
-    no_onload: true,
-  };
+  const ENDPOINT = 'https://g.hawksley.dev/count';
 
-  document.addEventListener('astro:page-load', () => {
-    if (goatcounter.count) {
-      goatcounter.count();
+  function isBot() {
+    const w = window;
+    const d = document;
+    const n = navigator;
+
+    if (w.callPhantom || w._phantom || w.phantom) return 150;
+    if (w.__nightmare) return 151;
+    if (d.__selenium_unwrapped || d.__webdriver_evaluate || d.__driver_evaluate)
+      return 152;
+    if (n.webdriver) return 153;
+    if (
+      w.screen.width === 0 ||
+      w.screen.height === 0 ||
+      (w.outerWidth === 0 && w.outerHeight === 0)
+    )
+      return 154;
+
+    return 0;
+  }
+
+  function filterCount() {
+    const bot = isBot();
+    if (bot) return `bot (${bot})`;
+    if (location !== parent.location) return 'frame';
+    if (
+      location.hostname.match(
+        /(localhost$|^127\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\.|^0\.0\.0\.0$)/,
+      )
+    ) {
+      return 'localhost';
     }
+    if (location.protocol === 'file:') return 'localfile';
+    return false;
+  }
+
+  function count(vars = {}) {
+    const filtered = filterCount();
+    if (filtered) {
+      if (console?.warn)
+        console.warn('goatcounter: not counting because of: ' + filtered);
+      return;
+    }
+
+    let path = vars.path ?? location.pathname + location.search;
+    let referrer = vars.referrer ?? document.referrer;
+    let title = vars.title ?? document.title;
+
+    const data = {
+      p: path,
+      r: referrer,
+      t: title,
+      e: !!vars.event,
+      s: window.screen.width,
+      q: location.search,
+      rnd: Math.random().toString(36).slice(2, 7),
+    };
+
+    const url = ENDPOINT + '?' + new URLSearchParams(data).toString();
+
+    if (!navigator.sendBeacon(url)) {
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.display = 'none';
+      img.setAttribute('alt', '');
+      img.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(img);
+    }
+  }
+
+  let isFirstLoad = true;
+  let previousUrl = document.referrer;
+
+  document.addEventListener('astro:before-swap', () => {
+    previousUrl = window.location.href;
   });
 
-  (function (goatcounter) {
-    'use strict';
+  function executeCount() {
+    count({
+      path: location.pathname + location.search,
+      referrer: previousUrl,
+    });
+  }
 
-    var enc = encodeURIComponent;
+  function setupFirstLoadTracking() {
+    if (document.prerendering) {
+      document.addEventListener(
+        'prerenderingchange',
+        () => setupFirstLoadTracking(),
+        { once: true },
+      );
+      return;
+    }
 
-    goatcounter.get_data = function (vars) {
-      vars = vars || {};
-      var data = {
-        p: vars.path === undefined ? goatcounter.path : vars.path,
-        r: vars.referrer === undefined ? goatcounter.referrer : vars.referrer,
-        t: vars.title === undefined ? goatcounter.title : vars.title,
-        e: !!(vars.event || goatcounter.event),
-        s: window.screen.width,
-        b: is_bot(),
-        q: location.search,
-      };
+    let counted = false;
+    let visibleStartTime =
+      document.visibilityState === 'visible' ? Date.now() : 0;
+    let dwellTimer = null;
 
-      var rcb, pcb, tcb;
-      if (typeof data.r === 'function') rcb = data.r;
-      if (typeof data.t === 'function') tcb = data.t;
-      if (typeof data.p === 'function') pcb = data.p;
+    const trigger = (e) => {
+      if (e && !e.isTrusted) return;
+      if (counted) return;
+      counted = true;
 
-      if (is_empty(data.r)) data.r = document.referrer;
-      if (is_empty(data.t)) data.t = document.title;
-      if (is_empty(data.p)) data.p = get_path();
-
-      if (rcb) data.r = rcb(data.r);
-      if (tcb) data.t = tcb(data.t);
-      if (pcb) data.p = pcb(data.p);
-      return data;
+      cleanup();
+      executeCount();
     };
 
-    var is_empty = function (v) {
-      return v === null || v === undefined || typeof v === 'function';
-    };
+    const events = ['pointerdown', 'scroll', 'wheel', 'keydown', 'touchstart'];
 
-    var is_bot = function () {
-      var w = window,
-        d = document;
-      if (w.callPhantom || w._phantom || w.phantom) return 150;
-      if (w.__nightmare) return 151;
-      if (
-        d.__selenium_unwrapped ||
-        d.__webdriver_evaluate ||
-        d.__driver_evaluate
-      )
-        return 152;
-      if (navigator.webdriver) return 153;
-      return 0;
-    };
-
-    var urlencode = function (obj) {
-      var p = [];
-      for (var k in obj)
-        if (
-          obj[k] !== '' &&
-          obj[k] !== null &&
-          obj[k] !== undefined &&
-          obj[k] !== false
-        )
-          p.push(enc(k) + '=' + enc(obj[k]));
-      return '?' + p.join('&');
-    };
-
-    var warn = function (msg) {
-      if (console && 'warn' in console) console.warn('goatcounter: ' + msg);
-    };
-
-    var get_path = function () {
-      var loc = location,
-        c = document.querySelector('link[rel="canonical"][href]');
-      if (c) {
-        var a = document.createElement('a');
-        a.href = c.href;
-        if (
-          a.hostname.replace(/^www\./, '') ===
-          location.hostname.replace(/^www\./, '')
-        )
-          loc = a;
+    let initialX = null,
+      initialY = null;
+    const onMouseMove = (e) => {
+      if (!e.isTrusted) return;
+      if (initialX === null) {
+        initialX = e.clientX;
+        initialY = e.clientY;
+        return;
       }
-      return loc.pathname + loc.search || '/';
-    };
-
-    var on_load = function (f) {
-      if (document.body === null)
-        document.addEventListener(
-          'DOMContentLoaded',
-          function () {
-            f();
-          },
-          false,
-        );
-      else f();
-    };
-
-    goatcounter.filter = function () {
       if (
-        'visibilityState' in document &&
-        document.visibilityState === 'prerender'
-      )
-        return 'visibilityState';
-      if (!goatcounter.allow_frame && location !== parent.location)
-        return 'frame';
-      if (
-        !goatcounter.allow_local &&
-        location.hostname.match(
-          /(localhost$|^127\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\.|^0\.0\.0\.0$)/,
-        )
-      )
-        return 'localhost';
-      if (!goatcounter.allow_local && location.protocol === 'file:')
-        return 'localfile';
-      return false;
-    };
-
-    goatcounter.url = function (vars) {
-      var data = goatcounter.get_data(vars || {});
-      if (data.p === null) return;
-      data.rnd = Math.random().toString(36).substr(2, 5);
-
-      var endpoint = 'https://g.hawksley.dev/count';
-
-      return endpoint + urlencode(data);
-    };
-
-    goatcounter.count = function (vars) {
-      var f = goatcounter.filter();
-      if (f) return warn('not counting because of: ' + f);
-      var url = goatcounter.url(vars);
-      if (!url) return warn('not counting because path callback returned null');
-
-      if (!navigator.sendBeacon(url)) {
-        var img = document.createElement('img');
-        img.src = url;
-        img.style.position = 'absolute';
-        img.style.bottom = '0px';
-        img.style.width = '1px';
-        img.style.height = '1px';
-        img.loading = 'eager';
-        img.setAttribute('alt', '');
-        img.setAttribute('aria-hidden', 'true');
-
-        var rm = function () {
-          if (img && img.parentNode) img.parentNode.removeChild(img);
-        };
-        img.addEventListener('load', rm, false);
-        document.body.appendChild(img);
+        Math.abs(e.clientX - initialX) > 2 ||
+        Math.abs(e.clientY - initialY) > 2
+      ) {
+        trigger(e);
       }
     };
 
-    goatcounter.bind_events = function () {
-      if (!document.querySelectorAll) return;
-
-      var send = function (elem) {
-        return function () {
-          goatcounter.count({
-            event: true,
-            path: elem.dataset.goatcounterClick || elem.name || elem.id || '',
-            title:
-              elem.dataset.goatcounterTitle ||
-              elem.title ||
-              (elem.innerHTML || '').substr(0, 200) ||
-              '',
-            referrer:
-              elem.dataset.goatcounterReferrer ||
-              elem.dataset.goatcounterReferral ||
-              '',
-          });
-        };
-      };
-
-      Array.prototype.slice
-        .call(document.querySelectorAll('*[data-goatcounter-click]'))
-        .forEach(function (elem) {
-          if (elem.dataset.goatcounterBound) return;
-          var f = send(elem);
-          elem.addEventListener('click', f, false);
-          elem.addEventListener('auxclick', f, false);
-          elem.dataset.goatcounterBound = 'true';
-        });
+    const cleanup = () => {
+      events.forEach((ev) => window.removeEventListener(ev, trigger));
+      window.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', onExit);
+      if (dwellTimer) clearTimeout(dwellTimer);
     };
 
-    if (!goatcounter.no_events) on_load(goatcounter.bind_events);
-  })(goatcounter);
+    const scheduleDwellTimer = () => {
+      if (dwellTimer) clearTimeout(dwellTimer);
+      if (document.visibilityState === 'visible') {
+        if (!visibleStartTime) visibleStartTime = Date.now();
+        dwellTimer = setTimeout(() => {
+          if (document.visibilityState === 'visible') trigger();
+        }, 2000);
+      }
+    };
+
+    const onExit = () => {
+      if (counted) return;
+      if (visibleStartTime && Date.now() - visibleStartTime > 1000) {
+        trigger();
+      }
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        scheduleDwellTimer();
+      } else {
+        onExit();
+      }
+    };
+
+    events.forEach((ev) =>
+      window.addEventListener(ev, trigger, { once: true, passive: true }),
+    );
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pagehide', onExit, { once: true });
+
+    scheduleDwellTimer();
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    if (!isFirstLoad) {
+      executeCount();
+      return;
+    }
+    isFirstLoad = false;
+    setupFirstLoadTracking();
+  });
 </script>
