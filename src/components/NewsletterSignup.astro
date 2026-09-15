@@ -1,19 +1,36 @@
 ---
+import A from './A.astro';
+
 const FORM_ID = '9595926';
 const action = `https://app.kit.com/forms/${FORM_ID}/subscriptions`;
 
 type Props = {
   heading: string;
   subtext: string;
+  showRss?: boolean;
 };
 
-const { heading, subtext } = Astro.props;
+const { heading, subtext, showRss } = Astro.props;
 ---
 
 <section aria-labelledby="newsletter-heading">
   <header>
     <h2 id="newsletter-heading">{heading}</h2>
-    <p>{subtext}</p>
+    <p>
+      {subtext}
+      {
+        showRss && (
+          <>
+            {' '}
+            Prefer feeds? Follow via{' '}
+            <A href="/rss.xml" pressable data-astro-prefetch="false">
+              RSS
+            </A>
+            .
+          </>
+        )
+      }
+    </p>
   </header>
 
   <form action={action} method="post" data-kit-form>

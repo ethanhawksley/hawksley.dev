@@ -1,4 +1,7 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { render } from 'astro:content';
 
 import Layout from '../../layouts/Layout.astro';
@@ -24,6 +27,13 @@ export const getStaticPaths = (async () => {
     },
   }));
 }) satisfies GetStaticPaths;
+
+const inlineImagePath = path.join(
+  process.cwd(),
+  'src/assets/ethan-hawksley-112.avif',
+);
+const inlineImageBuffer = fs.readFileSync(inlineImagePath);
+const inlineImageBase64 = `data:image/avif;base64,${inlineImageBuffer.toString('base64')}`;
 
 const { post, prevPost, nextPost } = Astro.props;
 const { Content } = await render(post);
@@ -140,9 +150,9 @@ const jsonLd = {
   <article>
     <header>
       <h1>{post.data.title}</h1>
+      <p class="byline">By <A href="/" pressable>Ethan Hawksley</A></p>
       <div class="post-meta-wrapper">
         <ul class="post-meta" role="list">
-          <li><A href="/">Ethan Hawksley</A></li>
           <li><FormattedDate date={post.data.pubDate} /></li>
           <li>
             <time datetime=`PT${readingTime}M`>{readingTime} min read</time>
@@ -160,12 +170,36 @@ const jsonLd = {
     <div class="prose">
       <Content components={{ a: A, img: BlogImage }} />
     </div>
+    <footer class="post-colophon">
+      <picture>
+        <source srcset="/ethan-hawksley.avif" type="image/avif" />
+        <img
+          class="colophon-avatar"
+          src="/ethan-hawksley.jpg"
+          alt="Ethan Hawksley"
+          width="56"
+          height="56"
+          loading="lazy"
+          fetchpriority="low"
+          decoding="async"
+          style={`background-image:url(${inlineImageBase64})`}
+        />
+      </picture>
+      <div class="colophon-text">
+        <p>
+          Written by <A href="/" pressable><strong>Ethan Hawksley</strong></A>,
+          a computer science student at the University&nbsp;of&nbsp;Warwick and
+          author of <A href="/the-second-maintainer">The Second Maintainer</A>.
+        </p>
+      </div>
+    </footer>
   </article>
 
   <div class="newsletter-wrapper">
     <NewsletterSignup
-      heading="Get new writing in your inbox"
-      subtext="Only sent when I publish something cool :)"
+      heading="Keep up to date"
+      subtext="Occasional emails when I publish new writing or projects."
+      showRss
     />
   </div>
 
@@ -413,7 +447,9 @@ const jsonLd = {
   @media print {
     .back-to-index,
     .copy-button,
-    .post-pager {
+    .post-pager,
+    .post-colophon,
+    .newsletter-wrapper {
       display: none !important;
     }
 
@@ -479,8 +515,23 @@ const jsonLd = {
   header {
     display: flex;
     flex-direction: column;
+    gap: 0.35rem;
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--color-border);
+  }
+
+  h1 {
+    margin-bottom: 0.25rem;
+  }
+
+  .byline {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  .byline :global(a) {
+    font-weight: var(--weight-medium);
   }
 
   .post-meta-wrapper {
@@ -522,10 +573,50 @@ const jsonLd = {
     color: var(--color-accent);
   }
 
+  .post-colophon {
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-colophon picture {
+    flex-shrink: 0;
+    display: flex;
+  }
+
+  .colophon-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    object-fit: cover;
+    background-color: #3e631f;
+    background-position: center;
+    background-size: cover;
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    filter: none !important;
+  }
+
+  .colophon-text p {
+    max-width: 55ch;
+    font-size: var(--font-size-sm);
+    line-height: var(--leading-normal);
+    color: var(--color-text-muted);
+  }
+
+  .colophon-text strong {
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
+  }
+
   .newsletter-wrapper {
     padding-top: 1.5rem;
-    margin-top: 2.5rem;
-    border-top: 1px solid var(--color-border);
+    margin-top: 0.5rem;
   }
 
   .post-pager {
