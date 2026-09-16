@@ -3,12 +3,14 @@ title: 'JSON-LD explained for personal websites'
 description: 'Everything you need to know about JSON-LD and how to implement it.'
 metaDescription: 'A guide to implementing JSON-LD on your personal website for better SEO, covering WebSite, Person, BlogPosting, and more with ready-to-use code snippets.'
 pubDate: 2026-06-21
-modDate: 2026-09-10
+modDate: 2026-09-16
 ---
 
-JSON-LD, also known as JSON Linked Data, is a format for adding structured data to webpages. It can aid web crawlers in understanding the semantic structure of your site, qualifying you for richer link previews, and even potentially improving your search ranking.
+> Update: Thanks for all the positive feedback! I've turned this post into a living document to keep it updated with current best practices. My aim here is to keep it practical and cut through the fluff you'll find on typical SEO-spam blogs.
 
-It's been 4 months since [my first post](https://hawksley.dev/blog/building-astro-blog) where I described building this site, and Wakatime estimates I've spent ~100 hours coding now, not including time spent researching and testing. Since then, this site has been receiving plenty of polish, including the addition of JSON-LD on each page.
+JSON-LD, also known as JSON Linked Data, is a format for adding structured data to webpages. It can aid web crawlers in understanding the semantic structure of your site, qualifying you for rich search results, and even potentially improving your search ranking.
+
+When I first wrote this post, it had been four months since [my first post](/blog/building-astro-blog) about building this site, with ~100 hours logged in WakaTime. Since then, the site has seen plenty of polish, including dedicated JSON-LD across every page.
 
 ## JSON-LD Fundamentals
 
@@ -202,11 +204,11 @@ A `ProfilePage`, as you may expect, describes a page on the site about a person.
     "@id": "https://hawksley.dev/#website"
   },
   "name": "About Ethan Hawksley",
-  "dateCreated": "2024-09-10T00:00:00.000Z",
-  "dateModified": "2026-05-17T00:00:00.000Z",
   "mainEntity": {
     "@id": "https://hawksley.dev/#person"
   },
+  "dateCreated": "2024-09-10T00:00:00.000Z",
+  "dateModified": "2026-09-16T00:00:00.000Z",
   "primaryImageOfPage": "https://hawksley.dev/ethan-hawksley.jpg"
 }
 ```
@@ -226,15 +228,15 @@ A `BreadcrumbList` describes the conceptual path to a page, which does not neces
   "itemListElement": [
     {
       "@type": "ListItem",
-      "item": "https://hawksley.dev/blog",
       "position": 1,
-      "name": "Blog"
+      "name": "Blog",
+      "item": "https://hawksley.dev/blog"
     },
     {
       "@type": "ListItem",
-      "item": "https://hawksley.dev/blog/hack-club-shipwrecked",
       "position": 2,
-      "name": "The Shipwrecked Hackathon by Hack Club"
+      "name": "The Shipwrecked Hackathon by Hack Club",
+      "item": "https://hawksley.dev/blog/hack-club-shipwrecked"
     }
   ]
 }
@@ -259,7 +261,6 @@ The `CollectionPage` node is a subtype of `WebPage`, usable for pages that prima
     "@id": "https://hawksley.dev/#website"
   },
   "name": "Elsewhere",
-  "description": "Online profiles of Ethan Hawksley, computer science student at the University of Warwick and author of The Second Maintainer.",
   "primaryImageOfPage": "https://hawksley.dev/ethan-hawksley.jpg"
 }
 ```
@@ -274,11 +275,17 @@ You should add the `Blog` node to your blog's index, or your home page if you do
 {
   "@type": "Blog",
   "@id": "https://hawksley.dev/blog#blog",
-  "name": "Ethan Hawksley's Blog",
-  "isPartOf": { "@id": "https://hawksley.dev/#website" },
-  "mainEntityOfPage": { "@id": "https://hawksley.dev/blog#webpage" },
   "url": "https://hawksley.dev/blog",
-  "publisher": { "@id": "https://hawksley.dev/#person" }
+  "isPartOf": {
+    "@id": "https://hawksley.dev/#website"
+  },
+  "mainEntityOfPage": {
+    "@id": "https://hawksley.dev/blog#webpage"
+  },
+  "name": "Ethan Hawksley's Blog",
+  "publisher": {
+    "@id": "https://hawksley.dev/#person"
+  }
 }
 ```
 
@@ -295,14 +302,13 @@ The last node we'll be covering is `BlogPosting`. It should be included on all p
   "@type": "BlogPosting",
   "@id": "https://hawksley.dev/blog/need-for-post-quantum-cryptography#blogposting",
   "url": "https://hawksley.dev/blog/need-for-post-quantum-cryptography",
-  "mainEntityOfPage": {
-    "@id": "https://hawksley.dev/blog/need-for-post-quantum-cryptography#webpage"
-  },
   "isPartOf": {
     "@id": "https://hawksley.dev/blog#blog"
   },
+  "mainEntityOfPage": {
+    "@id": "https://hawksley.dev/blog/need-for-post-quantum-cryptography#webpage"
+  },
   "headline": "The Need for Post-Quantum Cryptography",
-  "description": "Quantum computers are closer to breaking RSA and ECC than we thought. Learn what post-quantum cryptography is and how to start migrating.",
   "datePublished": "2026-04-13T00:00:00.000Z",
   "dateModified": "2026-04-17T00:00:00.000Z",
   "author": {
@@ -311,8 +317,8 @@ The last node we'll be covering is `BlogPosting`. It should be included on all p
   "publisher": {
     "@id": "https://hawksley.dev/#person"
   },
-  "image": "https://hawksley.dev/og/blog/need-for-post-quantum-cryptography.jpg",
-  "license": "https://creativecommons.org/licenses/by/4.0/"
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "image": "https://hawksley.dev/og/blog/need-for-post-quantum-cryptography.jpg"
 }
 ```
 
