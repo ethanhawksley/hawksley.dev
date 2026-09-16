@@ -1,5 +1,5 @@
 ---
-import { Picture } from 'astro:assets';
+import { getImage } from 'astro:assets';
 
 type Props = {
   src: ImageMetadata | string;
@@ -12,20 +12,59 @@ const { src, alt, lcp, ...attrs } = Astro.props;
 const isDev = import.meta.env.DEV;
 const isStringSrc = typeof src === 'string';
 
+function getStableUrl(source: ImageMetadata | string): string {
+  if (typeof source === 'string') {
+    if (/^(?:https?:|\/\/|\/)/i.test(source)) return source;
+    return Astro.params.id
+      ? `/blog/${Astro.params.id}/${source.replace(/^\.\//, '')}`
+      : source;
+  }
+
+  const fsPath =
+    'fsPath' in source && typeof source.fsPath === 'string'
+      ? source.fsPath.replaceAll('\\', '/')
+      : undefined;
+
+  const match = fsPath?.match(/src\/content\/blog\/([^/]+)\/(.+)$/);
+  if (match) return `/blog/${match[1]}/${match[2]}`;
+
+  if (Astro.params.id && source.src) {
+    const filename = source.src
+      .split('/')
+      .pop()
+      ?.replace(/\.[a-zA-Z0-9_-]{8}(\.[^.]+)$/, '$1');
+    if (filename) return `/blog/${Astro.params.id}/${filename}`;
+  }
+
+  return source.src;
+}
+
+const stableUrl = getStableUrl(src);
+
+const shouldOptimize = !isDev && !isStringSrc && src.format !== 'svg';
+
 const standardWidths = [360, 720, 1080, 1440];
-const widths =
-  !isDev && !isStringSrc
-    ? [
+const widths = shouldOptimize
+  ? [
+      ...new Set([
         ...standardWidths.filter((w) => w < src.width),
         Math.min(src.width, 1440),
-      ].filter((w, i, arr) => arr.indexOf(w) === i)
-    : undefined;
+      ]),
+    ]
+  : [];
+
+let avifSrcSet: string | undefined;
+
+if (widths.length > 0 && !isStringSrc) {
+  const avif = await getImage({ src, widths, format: 'avif' });
+  avifSrcSet = avif.srcSet.attribute;
+}
 ---
 
 {
-  isDev || isStringSrc ? (
+  !avifSrcSet ? (
     <img
-      src={isStringSrc ? src : src.src}
+      src={stableUrl}
       width={isStringSrc ? undefined : src.width}
       height={isStringSrc ? undefined : src.height}
       alt={alt}
@@ -35,17 +74,22 @@ const widths =
       {...attrs}
     />
   ) : (
-    <Picture
-      src={src}
-      alt={alt}
-      widths={widths}
-      formats={['avif', 'webp']}
-      fallbackFormat="jpeg"
-      sizes="(min-width: 768px) 720px, calc(100vw - 3rem)"
-      loading={lcp ? 'eager' : 'lazy'}
-      fetchpriority={lcp ? 'high' : undefined}
-      decoding={lcp ? 'sync' : 'async'}
-      {...attrs}
-    />
+    <picture>
+      <source
+        type="image/avif"
+        srcset={avifSrcSet}
+        sizes="(min-width: 768px) 720px, calc(100vw - 3rem)"
+      />
+      <img
+        src={stableUrl}
+        width={isStringSrc ? undefined : src.width}
+        height={isStringSrc ? undefined : src.height}
+        alt={alt}
+        loading={lcp ? 'eager' : 'lazy'}
+        fetchpriority={lcp ? 'high' : undefined}
+        decoding={lcp ? 'sync' : 'async'}
+        {...attrs}
+      />
+    </picture>
   )
 }
