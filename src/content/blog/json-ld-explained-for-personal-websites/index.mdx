@@ -274,22 +274,13 @@ You should add the `Blog` node to your blog's index, or your home page if you do
 {
   "@type": "Blog",
   "@id": "https://hawksley.dev/blog#blog",
-  "isPartOf": {
-    "@id": "https://hawksley.dev/#website"
-  },
-  "mainEntityOfPage": {
-    "@id": "https://hawksley.dev/blog#webpage"
-  },
   "name": "Ethan Hawksley's Blog",
-  "description": "A blog by Ethan Hawksley, a computer science student in the UK. Articles on systems programming, cybersecurity, and whatever else grabs my attention.",
-  "publisher": {
-    "@id": "https://hawksley.dev/#person"
-  },
-  "license": "https://creativecommons.org/licenses/by/4.0/"
+  "isPartOf": { "@id": "https://hawksley.dev/#website" },
+  "mainEntityOfPage": { "@id": "https://hawksley.dev/blog#webpage" },
+  "url": "https://hawksley.dev/blog",
+  "publisher": { "@id": "https://hawksley.dev/#person" },
 }
 ```
-
-`dateModified` is a good freshness signal, but if you don't have it handy, don't worry. Including `license` lets crawlers know under what circumstances they can use your prose.
 
 ![Definition of publisher property, where available types include Organization and Person](./jsonld-publisher-organization-person.png)
 
