@@ -19,35 +19,25 @@ export const personJsonLd = {
   nationality: {
     '@type': 'Country',
     name: 'United Kingdom',
-    sameAs: 'https://www.wikidata.org/wiki/Q145',
   },
   affiliation: {
     '@type': 'CollegeOrUniversity',
     url: 'https://warwick.ac.uk',
     name: 'University of Warwick',
-    sameAs: [
-      'https://www.wikidata.org/wiki/Q865528',
-      'https://en.wikipedia.org/wiki/University_of_Warwick',
-    ],
+    sameAs: 'https://en.wikipedia.org/wiki/University_of_Warwick',
   },
   alumniOf: [
     {
       '@type': 'HighSchool',
       url: 'https://www.alcestergs.co.uk',
       name: 'Alcester Grammar School',
-      sameAs: [
-        'https://www.wikidata.org/wiki/Q4713005',
-        'https://en.wikipedia.org/wiki/Alcester_Grammar_School',
-      ],
+      sameAs: 'https://en.wikipedia.org/wiki/Alcester_Grammar_School',
     },
     {
       '@type': 'HighSchool',
       url: 'https://www.brookeweston.org',
       name: 'Brooke Weston Academy',
-      sameAs: [
-        'https://www.wikidata.org/wiki/Q4974495',
-        'https://en.wikipedia.org/wiki/Brooke_Weston_Academy',
-      ],
+      sameAs: 'https://en.wikipedia.org/wiki/Brooke_Weston_Academy',
     },
   ],
   image: 'https://hawksley.dev/ethan-hawksley.jpg',
