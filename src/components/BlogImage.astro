@@ -85,7 +85,7 @@ if (widths.length > 0 && !isStringSrc) {
         width={isStringSrc ? undefined : src.width}
         height={isStringSrc ? undefined : src.height}
         alt={alt}
-        loading={lcp ? 'eager' : 'lazy'}
+        loading={lcp ? undefined : 'lazy'}
         fetchpriority={lcp ? 'high' : undefined}
         decoding={lcp ? 'sync' : 'async'}
         {...attrs}
