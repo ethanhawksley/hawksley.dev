@@ -73,7 +73,6 @@ const jsonLd = {
       isPartOf: { '@id': 'https://hawksley.dev/blog#blog' },
       mainEntityOfPage: { '@id': `${postUrl}#webpage` },
       headline: post.data.title,
-      description: post.data.metaDescription,
       datePublished: post.data.pubDate.toISOString(),
       dateModified:
         post.data.modDate?.toISOString() ?? post.data.pubDate.toISOString(),
