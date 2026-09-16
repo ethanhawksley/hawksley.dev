@@ -70,8 +70,8 @@ const jsonLd = {
       '@type': 'BlogPosting',
       '@id': `${postUrl}#blogposting`,
       url: postUrl,
-      mainEntityOfPage: { '@id': `${postUrl}#webpage` },
       isPartOf: { '@id': 'https://hawksley.dev/blog#blog' },
+      mainEntityOfPage: { '@id': `${postUrl}#webpage` },
       headline: post.data.title,
       description: post.data.metaDescription,
       datePublished: post.data.pubDate.toISOString(),
@@ -79,8 +79,8 @@ const jsonLd = {
         post.data.modDate?.toISOString() ?? post.data.pubDate.toISOString(),
       author: { '@id': 'https://hawksley.dev/#person' },
       publisher: { '@id': 'https://hawksley.dev/#person' },
-      image: ogImageUrl,
       license: 'https://creativecommons.org/licenses/by/4.0/',
+      image: ogImageUrl,
     },
     {
       '@type': 'BreadcrumbList',
@@ -88,15 +88,15 @@ const jsonLd = {
       itemListElement: [
         {
           '@type': 'ListItem',
-          item: 'https://hawksley.dev/blog',
           position: 1,
           name: 'Blog',
+          item: 'https://hawksley.dev/blog',
         },
         {
           '@type': 'ListItem',
-          item: postUrl,
           position: 2,
           name: post.data.title,
+          item: postUrl,
         },
       ],
     },
@@ -583,8 +583,8 @@ const jsonLd = {
   }
 
   .post-colophon picture {
-    flex-shrink: 0;
     display: flex;
+    flex-shrink: 0;
   }
 
   .colophon-avatar {
