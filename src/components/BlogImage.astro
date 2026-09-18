@@ -4,10 +4,13 @@ import { getImage } from 'astro:assets';
 type Props = {
   src: ImageMetadata | string;
   alt: string;
-  lcp?: boolean;
+  title?: string;
 };
 
-const { src, alt, lcp, ...attrs } = Astro.props;
+const { src, alt, title, ...attrs } = Astro.props;
+
+const isLcp = title?.trim() === 'lcp';
+const cleanTitle = isLcp ? undefined : title;
 
 const isDev = import.meta.env.DEV;
 const isStringSrc = typeof src === 'string';
@@ -68,9 +71,10 @@ if (widths.length > 0 && !isStringSrc) {
       width={isStringSrc ? undefined : src.width}
       height={isStringSrc ? undefined : src.height}
       alt={alt}
-      loading={lcp ? undefined : 'lazy'}
-      fetchpriority={lcp ? 'high' : undefined}
-      decoding={lcp ? 'sync' : 'async'}
+      title={cleanTitle}
+      loading={isLcp ? undefined : 'lazy'}
+      fetchpriority={isLcp ? 'high' : undefined}
+      decoding={isLcp ? 'sync' : 'async'}
       {...attrs}
     />
   ) : (
@@ -85,9 +89,10 @@ if (widths.length > 0 && !isStringSrc) {
         width={isStringSrc ? undefined : src.width}
         height={isStringSrc ? undefined : src.height}
         alt={alt}
-        loading={lcp ? undefined : 'lazy'}
-        fetchpriority={lcp ? 'high' : undefined}
-        decoding={lcp ? 'sync' : 'async'}
+        title={cleanTitle}
+        loading={isLcp ? undefined : 'lazy'}
+        fetchpriority={isLcp ? 'high' : undefined}
+        decoding={isLcp ? 'sync' : 'async'}
         {...attrs}
       />
     </picture>
