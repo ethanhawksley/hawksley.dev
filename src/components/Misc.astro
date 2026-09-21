@@ -1,123 +1,129 @@
 <script>
-  // @ts-nocheck
   console.log('Welcome to the console! :)');
 
-  try {
-    let historyJson = sessionStorage.getItem('pageHistory');
-    let pageHistory = historyJson ? JSON.parse(historyJson) : [];
-    let hasChosen = false;
+  function initEasterEgg() {
+    try {
+      const historyJson = sessionStorage.getItem('pageHistory');
+      let pageHistory = historyJson ? JSON.parse(historyJson) : [];
+      let hasChosen = false;
 
-    if (
-      pageHistory.length >= 2 &&
-      pageHistory[pageHistory.length - 2] !== window.location.href
-    ) {
-      pageHistory = [window.location.href];
-    } else {
-      pageHistory.push(window.location.href);
-    }
-
-    if (pageHistory.length === 16) {
-      sessionStorage.removeItem('pageHistory');
-      console.log('* (Well, there is a man here.)');
-      console.log('* (He offered you something.)');
-      console.log('yes   no');
-
-      function setupResponse(option, reply) {
-        Object.defineProperty(window, option, {
-          get() {
-            if (hasChosen) {
-              console.log('* (Well, there is not a man here.)');
-            } else {
-              console.log(reply);
-              hasChosen = true;
-            }
-          },
-          configurable: true,
-        });
+      if (
+        pageHistory.length >= 2 &&
+        pageHistory[pageHistory.length - 2] !== window.location.href
+      ) {
+        pageHistory = [window.location.href];
+      } else {
+        pageHistory.push(window.location.href);
       }
-      setupResponse('yes', '* (You received an Easter Egg.)');
-      setupResponse('no', "* (Then he needn't be here.)");
-    } else {
-      sessionStorage.setItem('pageHistory', JSON.stringify(pageHistory));
-    }
-  } catch {}
+
+      if (pageHistory.length === 16) {
+        sessionStorage.removeItem('pageHistory');
+        console.log('* (Well, there is a man here.)');
+        console.log('* (He offered you something.)');
+        console.log('yes   no');
+
+        const setupResponse = (option: 'yes' | 'no', reply: string) => {
+          Object.defineProperty(window, option, {
+            get() {
+              if (hasChosen) {
+                console.log('* (Well, there is not a man here.)');
+              } else {
+                console.log(reply);
+                hasChosen = true;
+              }
+            },
+            configurable: true,
+          });
+        };
+
+        setupResponse('yes', '* (You received an Easter Egg.)');
+        setupResponse('no', "* (Then he needn't be here.)");
+      } else {
+        sessionStorage.setItem('pageHistory', JSON.stringify(pageHistory));
+      }
+    } catch {}
+  }
 
   const ENDPOINT = 'https://g.hawksley.dev/count';
 
-  function isBot() {
-    const w = window;
-    const d = document;
-    const n = navigator;
+  interface CountOptions {
+    path?: string;
+    referrer?: string;
+    title?: string;
+  }
 
-    if (w.callPhantom || w._phantom || w.phantom) return 150;
-    if (w.__nightmare) return 151;
-    if (d.__selenium_unwrapped || d.__webdriver_evaluate || d.__driver_evaluate)
-      return 152;
-    if (n.webdriver) return 153;
+  function isBot(): number {
+    if (window.callPhantom || window._phantom || window.phantom) return 150;
+    if (window.__nightmare) return 151;
     if (
-      w.screen.width === 0 ||
-      w.screen.height === 0 ||
-      (w.outerWidth === 0 && w.outerHeight === 0)
-    )
+      document.__selenium_unwrapped ||
+      document.__webdriver_evaluate ||
+      document.__driver_evaluate
+    ) {
+      return 152;
+    }
+    if (navigator.webdriver) return 153;
+    if (
+      window.screen.width === 0 ||
+      window.screen.height === 0 ||
+      (window.outerWidth === 0 && window.outerHeight === 0)
+    ) {
       return 154;
+    }
 
     return 0;
   }
 
-  function filterCount() {
+  function filterCount(): string | false {
     const bot = isBot();
     if (bot) return `bot (${bot})`;
-    if (location !== parent.location) return 'frame';
+    if (window.location !== window.parent.location) return 'frame';
     if (
-      location.hostname.match(
-        /(localhost$|^127\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\.|^192\.168\.|^0\.0\.0\.0$)/,
+      /^(localhost$|127\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|0\.0\.0\.0$)/.test(
+        window.location.hostname,
       )
     ) {
       return 'localhost';
     }
-    if (location.protocol === 'file:') return 'localfile';
+    if (window.location.protocol === 'file:') return 'localfile';
     return false;
   }
 
-  function count(vars = {}) {
+  function count(vars: CountOptions = {}): void {
     const filtered = filterCount();
     if (filtered) {
-      if (console?.warn)
-        console.warn('goatcounter: not counting because of: ' + filtered);
+      if (console.warn) {
+        console.warn(`goatcounter: not counting because of: ${filtered}`);
+      }
       return;
     }
 
-    let path = vars.path ?? location.pathname + location.search;
-    let title = vars.title ?? document.title;
+    const path = vars.path ?? window.location.pathname + window.location.search;
+    const referrer = vars.referrer ?? document.referrer;
+    const title = vars.title ?? document.title;
 
     const data = {
       p: path,
-      r: document.referrer,
+      r: referrer,
       t: title,
-      s: window.screen.width,
-      q: location.search,
+      s: window.screen.width.toString(),
+      q: window.location.search,
       rnd: Math.random().toString(36).slice(2, 7),
     };
 
-    const url = ENDPOINT + '?' + new URLSearchParams(data).toString();
+    const url = `${ENDPOINT}?${new URLSearchParams(data).toString()}`;
 
     if (!navigator.sendBeacon(url)) {
       const img = document.createElement('img');
       img.src = url;
       img.style.display = 'none';
-      img.setAttribute('alt', '');
+      img.alt = '';
       img.setAttribute('aria-hidden', 'true');
       document.body.appendChild(img);
     }
   }
 
-  function executeCount() {
-    count({
-      path: location.pathname + location.search,
-    });
-  }
-
-  function setupTracking() {
+  function setupTracking(): void {
     if (document.prerendering) {
       document.addEventListener('prerenderingchange', () => setupTracking(), {
         once: true,
@@ -128,9 +134,24 @@
     let counted = false;
     let visibleStartTime =
       document.visibilityState === 'visible' ? Date.now() : 0;
-    let dwellTimer = null;
+    let dwellTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const trigger = (e) => {
+    const executeCount = () => {
+      count({
+        path: window.location.pathname + window.location.search,
+        referrer: document.referrer,
+      });
+    };
+
+    const cleanup = () => {
+      events.forEach((ev) => window.removeEventListener(ev, trigger));
+      window.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', onExit);
+      if (dwellTimer !== null) clearTimeout(dwellTimer);
+    };
+
+    const trigger = (e?: Event) => {
       if (e && !e.isTrusted) return;
       if (counted) return;
       counted = true;
@@ -139,13 +160,20 @@
       executeCount();
     };
 
-    const events = ['pointerdown', 'scroll', 'wheel', 'keydown', 'touchstart'];
+    const events = [
+      'pointerdown',
+      'scroll',
+      'wheel',
+      'keydown',
+      'touchstart',
+    ] as const;
 
-    let initialX = null,
-      initialY = null;
-    const onMouseMove = (e) => {
+    let initialX: number | null = null;
+    let initialY: number | null = null;
+
+    const onMouseMove = (e: MouseEvent) => {
       if (!e.isTrusted) return;
-      if (initialX === null) {
+      if (initialX === null || initialY === null) {
         initialX = e.clientX;
         initialY = e.clientY;
         return;
@@ -158,16 +186,8 @@
       }
     };
 
-    const cleanup = () => {
-      events.forEach((ev) => window.removeEventListener(ev, trigger));
-      window.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('pagehide', onExit);
-      if (dwellTimer) clearTimeout(dwellTimer);
-    };
-
     const scheduleDwellTimer = () => {
-      if (dwellTimer) clearTimeout(dwellTimer);
+      if (dwellTimer !== null) clearTimeout(dwellTimer);
       if (document.visibilityState === 'visible') {
         if (!visibleStartTime) visibleStartTime = Date.now();
         dwellTimer = setTimeout(() => {
@@ -201,5 +221,6 @@
     scheduleDwellTimer();
   }
 
+  initEasterEgg();
   setupTracking();
 </script>
