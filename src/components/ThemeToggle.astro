@@ -59,18 +59,14 @@ import Sun from '../assets/sun.svg';
   const mediaQuery = matchMedia('(prefers-color-scheme: dark)');
 
   let button: HTMLElement | null = null;
-
   let activeTransition: ViewTransition | null = null;
   let transitionController: AbortController | null = null;
-
   let isReady = false;
 
   let startTheme: 'light' | 'dark' = 'light';
   let targetTheme: 'light' | 'dark' = 'dark';
   let intendedTheme: 'light' | 'dark' = 'dark';
-
   let isPressed = false;
-
   let pendingCleanup = false;
 
   let noTransitionsRaf1: number | null = null;
@@ -210,7 +206,7 @@ import Sun from '../assets/sun.svg';
       '(prefers-reduced-motion: reduce)',
     ).matches;
 
-    if (!window.__themeTransition || prefersReducedMotion) {
+    if (!document.startViewTransition || prefersReducedMotion) {
       window.__setTheme(targetTheme, true);
       updateAria(targetTheme);
       return;
@@ -280,7 +276,7 @@ import Sun from '../assets/sun.svg';
 
     isReady = false;
 
-    const transition = window.__themeTransition(() => {
+    const transition = document.startViewTransition(() => {
       window.__setTheme(targetTheme, true);
       updateAria(targetTheme);
     });
@@ -322,46 +318,20 @@ import Sun from '../assets/sun.svg';
     updateAria(theme);
   }
 
-  function initThemeToggle() {
-    button = document.getElementById('theme-toggle');
-    if (!button) return;
-
+  button = document.getElementById('theme-toggle');
+  if (button) {
     button.addEventListener('click', toggleTheme);
     updateAria(window.__getTheme());
 
-    const controller = new AbortController();
-    const { signal } = controller;
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'theme') syncTheme();
+    });
 
-    window.addEventListener(
-      'storage',
-      (e) => {
-        if (e.key === 'theme') syncTheme();
-      },
-      { signal },
-    );
-
-    mediaQuery.addEventListener(
-      'change',
-      () => {
-        try {
-          if (localStorage.getItem('theme') !== null) return;
-        } catch {}
-        syncTheme();
-      },
-      { signal },
-    );
-
-    document.addEventListener(
-      'astro:before-swap',
-      () => {
-        cancelNoTransitionsCleanup();
-        activeTransition?.skipTransition();
-        cleanupTransition();
-        controller.abort();
-      },
-      { once: true },
-    );
+    mediaQuery.addEventListener('change', () => {
+      try {
+        if (localStorage.getItem('theme') !== null) return;
+      } catch {}
+      syncTheme();
+    });
   }
-
-  document.addEventListener('astro:page-load', initThemeToggle);
 </script>

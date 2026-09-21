@@ -1,6 +1,4 @@
 ---
-import { ClientRouter } from 'astro:transitions';
-
 import Footer from '../components/Footer.astro';
 import Misc from '../components/Misc.astro';
 import Navigation from '../components/Navigation.astro';
@@ -139,25 +137,6 @@ const isIndexable = !robots.includes('noindex');
 
       window.__setTheme(window.__getTheme(), false);
 
-      window.__themeTransition = document.startViewTransition
-        ? document.startViewTransition.bind(document)
-        : null;
-
-      // Chromium has unbypassable flash of white on inter-page transitions.
-      // Other engines don't have this problem.
-      if (
-        navigator.userAgentData &&
-        navigator.userAgentData.brands &&
-        navigator.userAgentData.brands.some((item) => item.brand === 'Chromium')
-      ) {
-        document.startViewTransition = undefined;
-      }
-
-      document.addEventListener('astro:before-swap', (event) => {
-        window.__setTheme(window.__getTheme(), false, event.newDocument);
-        event.newDocument.documentElement.classList.add('js');
-      });
-
       document.documentElement.classList.add('js');
     </script>
 
@@ -251,8 +230,6 @@ const isIndexable = !robots.includes('noindex');
         />
       )
     }
-
-    <ClientRouter />
   </head>
   <body>
     <svg xmlns="http://www.w3.org/2000/svg" style="display:none">

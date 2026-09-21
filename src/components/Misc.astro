@@ -2,44 +2,45 @@
   // @ts-nocheck
   console.log('Welcome to the console! :)');
 
-  let pageHistory = [window.location.href];
-  let hasChosen = false;
+  try {
+    let historyJson = sessionStorage.getItem('pageHistory');
+    let pageHistory = historyJson ? JSON.parse(historyJson) : [];
+    let hasChosen = false;
 
-  document.addEventListener('astro:after-swap', () => {
-    if (pageHistory.length > 0) {
-      if (
-        pageHistory.length >= 2 &&
-        pageHistory[pageHistory.length - 2] !== window.location.href
-      ) {
-        pageHistory = [window.location.href];
-      } else {
-        pageHistory.push(window.location.href);
-      }
-
-      if (pageHistory.length === 16) {
-        pageHistory = [];
-        console.log('* (Well, there is a man here.)');
-        console.log('* (He offered you something.)');
-        console.log('yes   no');
-
-        function setupResponse(option, reply) {
-          Object.defineProperty(window, option, {
-            get() {
-              if (hasChosen) {
-                console.log('* (Well, there is not a man here.)');
-              } else {
-                console.log(reply);
-                hasChosen = true;
-              }
-            },
-            configurable: true,
-          });
-        }
-        setupResponse('yes', '* (You received an Easter Egg.)');
-        setupResponse('no', "* (Then he needn't be here.)");
-      }
+    if (
+      pageHistory.length >= 2 &&
+      pageHistory[pageHistory.length - 2] !== window.location.href
+    ) {
+      pageHistory = [window.location.href];
+    } else {
+      pageHistory.push(window.location.href);
     }
-  });
+
+    if (pageHistory.length === 16) {
+      sessionStorage.removeItem('pageHistory');
+      console.log('* (Well, there is a man here.)');
+      console.log('* (He offered you something.)');
+      console.log('yes   no');
+
+      function setupResponse(option, reply) {
+        Object.defineProperty(window, option, {
+          get() {
+            if (hasChosen) {
+              console.log('* (Well, there is not a man here.)');
+            } else {
+              console.log(reply);
+              hasChosen = true;
+            }
+          },
+          configurable: true,
+        });
+      }
+      setupResponse('yes', '* (You received an Easter Egg.)');
+      setupResponse('no', "* (Then he needn't be here.)");
+    } else {
+      sessionStorage.setItem('pageHistory', JSON.stringify(pageHistory));
+    }
+  } catch {}
 
   const ENDPOINT = 'https://g.hawksley.dev/count';
 
@@ -87,12 +88,11 @@
     }
 
     let path = vars.path ?? location.pathname + location.search;
-    let referrer = vars.referrer ?? document.referrer;
     let title = vars.title ?? document.title;
 
     const data = {
       p: path,
-      r: referrer,
+      r: document.referrer,
       t: title,
       s: window.screen.width,
       q: location.search,
@@ -111,27 +111,17 @@
     }
   }
 
-  let isFirstLoad = true;
-  let previousUrl = document.referrer;
-
-  document.addEventListener('astro:before-swap', () => {
-    previousUrl = window.location.href;
-  });
-
   function executeCount() {
     count({
       path: location.pathname + location.search,
-      referrer: previousUrl,
     });
   }
 
-  function setupFirstLoadTracking() {
+  function setupTracking() {
     if (document.prerendering) {
-      document.addEventListener(
-        'prerenderingchange',
-        () => setupFirstLoadTracking(),
-        { once: true },
-      );
+      document.addEventListener('prerenderingchange', () => setupTracking(), {
+        once: true,
+      });
       return;
     }
 
@@ -211,12 +201,5 @@
     scheduleDwellTimer();
   }
 
-  document.addEventListener('astro:page-load', () => {
-    if (!isFirstLoad) {
-      executeCount();
-      return;
-    }
-    isFirstLoad = false;
-    setupFirstLoadTracking();
-  });
+  setupTracking();
 </script>

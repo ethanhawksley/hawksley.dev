@@ -730,56 +730,37 @@ const jsonLd = {
     }, 4000);
   }
 
-  function initCopyButtons() {
-    const controller = new AbortController();
-
-    document.addEventListener(
-      'click',
-      async (event: MouseEvent) => {
-        const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
-          '.copy-button',
-        );
-        if (!button) return;
-
-        const code = button
-          .closest('pre')
-          ?.querySelector('code')
-          ?.textContent?.trimEnd();
-        if (!code) return;
-
-        try {
-          if (!navigator.clipboard?.writeText) return;
-          await navigator.clipboard.writeText(code);
-        } catch {
-          return;
-        }
-
-        announce('Code copied to clipboard');
-
-        button.dataset.copied = 'true';
-
-        const prev = timeouts.get(button);
-        if (prev) clearTimeout(prev);
-
-        timeouts.set(
-          button,
-          setTimeout(() => {
-            delete button.dataset.copied;
-          }, 2000),
-        );
-      },
-      { signal: controller.signal },
+  document.addEventListener('click', async (event: MouseEvent) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
+      '.copy-button',
     );
+    if (!button) return;
 
-    document.addEventListener(
-      'astro:before-swap',
-      () => {
-        if (announcerTimeout) clearTimeout(announcerTimeout);
-        controller.abort();
-      },
-      { once: true },
+    const code = button
+      .closest('pre')
+      ?.querySelector('code')
+      ?.textContent?.trimEnd();
+    if (!code) return;
+
+    try {
+      if (!navigator.clipboard?.writeText) return;
+      await navigator.clipboard.writeText(code);
+    } catch {
+      return;
+    }
+
+    announce('Code copied to clipboard');
+
+    button.dataset.copied = 'true';
+
+    const prev = timeouts.get(button);
+    if (prev) clearTimeout(prev);
+
+    timeouts.set(
+      button,
+      setTimeout(() => {
+        delete button.dataset.copied;
+      }, 2000),
     );
-  }
-
-  document.addEventListener('astro:page-load', initCopyButtons);
+  });
 </script>

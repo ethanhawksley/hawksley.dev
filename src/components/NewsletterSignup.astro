@@ -168,62 +168,46 @@ const { heading, subtext, showRss } = Astro.props;
 </style>
 
 <script>
-  function initNewsletter() {
-    const controller = new AbortController();
-
-    document.addEventListener(
-      'submit',
-      async (event: SubmitEvent) => {
-        const form = (event.target as HTMLElement).closest<HTMLFormElement>(
-          '[data-kit-form]',
-        );
-        if (!form) return;
-
-        event.preventDefault();
-
-        const container = form.closest('section');
-        if (!container) return;
-
-        const success = container.querySelector<HTMLElement>(
-          '.newsletter-success',
-        );
-        const error = container.querySelector<HTMLElement>('.newsletter-error');
-        const button = form.querySelector('button');
-
-        if (!button || !success || !error) return;
-        if (button.getAttribute('aria-disabled') === 'true') return;
-
-        button.setAttribute('aria-disabled', 'true');
-        const originalText = button.textContent;
-        button.textContent = 'Subscribing…';
-        error.hidden = true;
-
-        try {
-          const res = await fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: { Accept: 'application/json' },
-          });
-
-          if (!res.ok) throw new Error();
-
-          form.hidden = true;
-          success.hidden = false;
-          success.focus();
-        } catch {
-          error.hidden = false;
-          button.removeAttribute('aria-disabled');
-          button.textContent = originalText;
-          error.focus();
-        }
-      },
-      { signal: controller.signal },
+  document.addEventListener('submit', async (event: SubmitEvent) => {
+    const form = (event.target as HTMLElement).closest<HTMLFormElement>(
+      '[data-kit-form]',
     );
+    if (!form) return;
 
-    document.addEventListener('astro:before-swap', () => controller.abort(), {
-      once: true,
-    });
-  }
+    event.preventDefault();
 
-  document.addEventListener('astro:page-load', initNewsletter);
+    const container = form.closest('section');
+    if (!container) return;
+
+    const success = container.querySelector<HTMLElement>('.newsletter-success');
+    const error = container.querySelector<HTMLElement>('.newsletter-error');
+    const button = form.querySelector('button');
+
+    if (!button || !success || !error) return;
+    if (button.getAttribute('aria-disabled') === 'true') return;
+
+    button.setAttribute('aria-disabled', 'true');
+    const originalText = button.textContent;
+    button.textContent = 'Subscribing…';
+    error.hidden = true;
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      });
+
+      if (!res.ok) throw new Error();
+
+      form.hidden = true;
+      success.hidden = false;
+      success.focus();
+    } catch {
+      error.hidden = false;
+      button.removeAttribute('aria-disabled');
+      button.textContent = originalText;
+      error.focus();
+    }
+  });
 </script>
