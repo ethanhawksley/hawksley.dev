@@ -5,10 +5,6 @@ import { defineConfig } from 'astro/config';
 
 export default defineConfig({
   site: 'https://hawksley.dev',
-  prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
-  },
   trailingSlash: 'never',
   build: {
     inlineStylesheets: 'always',
