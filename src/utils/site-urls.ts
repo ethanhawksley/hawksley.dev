@@ -4,7 +4,7 @@ export const NON_CONTENT_URLS = [
   'https://hawksley.dev/site.webmanifest',
   'https://hawksley.dev/sitemap.xml',
   'https://hawksley.dev/sitemap.txt',
-  'https://hawksley.dev/key.asc',
+  'https://hawksley.dev/pgp.asc',
   'https://hawksley.dev/rss.xml',
   'https://hawksley.dev/feed.json',
   'https://hawksley.dev/elsewhere.txt',
