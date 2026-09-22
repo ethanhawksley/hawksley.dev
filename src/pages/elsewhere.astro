@@ -35,13 +35,11 @@ const ogImageUrl = new URL('/og/elsewhere.jpg', Astro.site).toString();
   <p>You can find me on various other platforms around the web.</p>
   {
     profileSections.map((section) => {
-      const slug = section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const id = `heading-${slug}`;
       // Internal links are used instead of external for profiles.
       // It reduces the visual clutter of arrows, whilst staying consistent UX.
       return (
         <section>
-          <h2 id={id}>{section.title}</h2>
+          <h2>{section.title}</h2>
           <ul role="list">
             {section.links.map((link) => (
               <li>

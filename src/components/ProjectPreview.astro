@@ -45,7 +45,7 @@ const { name, description, links = [], url, type, stack } = Astro.props;
       </div>
       {
         links.length > 0 && (
-          <div class="meta-actions">
+          <div>
             {links.map((link) => (
               <A href={link.url} pressable>
                 <span class="sr-only">View {name}</span> {link.name}

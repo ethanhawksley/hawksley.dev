@@ -552,27 +552,17 @@ const jsonLd = {
     color: var(--color-text-muted);
   }
 
-  .post-meta > li,
-  .nested-meta {
+  .post-meta > li {
     position: relative;
     padding-left: 1.25rem;
   }
 
-  .post-meta > li::before,
-  .nested-meta::before {
+  .post-meta > li::before {
     position: absolute;
     top: 50%;
     left: 0.625rem;
     content: '·';
     transform: translate(-50%, -50%);
-  }
-
-  .post-meta :global(a) {
-    color: var(--color-text-muted);
-  }
-
-  .post-meta :global(a:hover) {
-    color: var(--color-accent);
   }
 
   .post-colophon {
