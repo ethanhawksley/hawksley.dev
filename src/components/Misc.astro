@@ -144,47 +144,86 @@
   }
 
   function isBot() {
-    if (window.callPhantom || window._phantom || window.phantom) return 150;
-    if (window.__nightmare) return 151;
+    console.log('[goatcounter] Evaluating bot/automation signatures...');
+    if (window.callPhantom || window._phantom || window.phantom) {
+      console.log('[goatcounter] Detected PhantomJS');
+      return 150;
+    }
+    if (window.__nightmare) {
+      console.log('[goatcounter] Detected Nightmare');
+      return 151;
+    }
     if (
       document.__selenium_unwrapped ||
       document.__webdriver_evaluate ||
       document.__driver_evaluate
     ) {
+      console.log(
+        '[goatcounter] Detected Selenium/WebDriver document properties',
+      );
       return 152;
     }
-    if (navigator.webdriver) return 153;
+    if (navigator.webdriver) {
+      console.log('[goatcounter] Detected navigator.webdriver === true');
+      return 153;
+    }
     if (
       window.screen.width === 0 ||
       window.screen.height === 0 ||
       (window.outerWidth === 0 && window.outerHeight === 0)
     ) {
+      console.log('[goatcounter] Detected zero-dimension window/screen:', {
+        screenWidth: window.screen.width,
+        screenHeight: window.screen.height,
+        outerWidth: window.outerWidth,
+        outerHeight: window.outerHeight,
+      });
       return 154;
     }
 
+    console.log('[goatcounter] Bot checks passed (not detected as bot).');
     return 0;
   }
 
   function filterCount() {
+    console.log('[goatcounter] Evaluating filter conditions...');
     const bot = isBot();
-    if (bot) return `bot (${bot})`;
-    if (window.location !== window.parent.location) return 'frame';
+    if (bot) {
+      console.log(`[goatcounter] Filtered: bot detected (${bot})`);
+      return `bot (${bot})`;
+    }
+    if (window.location !== window.parent.location) {
+      console.log('[goatcounter] Filtered: running inside an iframe/frame');
+      return 'frame';
+    }
     if (
       /^(localhost$|127\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|0\.0\.0\.0$)/.test(
         window.location.hostname,
       )
     ) {
+      console.log(
+        `[goatcounter] Filtered: local/private hostname "${window.location.hostname}"`,
+      );
       return 'localhost';
     }
-    if (window.location.protocol === 'file:') return 'localfile';
+    if (window.location.protocol === 'file:') {
+      console.log('[goatcounter] Filtered: file:// protocol');
+      return 'localfile';
+    }
+    console.log(
+      '[goatcounter] Filter passed: environment eligible for tracking.',
+    );
     return false;
   }
 
   function count(vars: CountOptions = {}) {
+    console.log('[goatcounter] count() called with options:', vars);
     const filtered = filterCount();
     if (filtered) {
       if (console.warn) {
-        console.warn(`goatcounter: not counting because of: ${filtered}`);
+        console.warn(
+          `[goatcounter] Not counting because filter matched: "${filtered}"`,
+        );
       }
       return;
     }
@@ -203,24 +242,45 @@
     };
 
     const url = `https://g.hawksley.dev/count?${new URLSearchParams(data).toString()}`;
+    console.log('[goatcounter] Preparing to send ping:', { data, url });
 
-    if (!navigator.sendBeacon(url)) {
+    if (navigator.sendBeacon && navigator.sendBeacon(url)) {
+      console.log(
+        '[goatcounter] Ping dispatched successfully via navigator.sendBeacon()',
+      );
+    } else {
+      console.log(
+        '[goatcounter] navigator.sendBeacon() unavailable or returned false; injecting fallback <img> tag',
+      );
       const img = document.createElement('img');
       img.src = url;
       img.style.display = 'none';
       img.alt = '';
       img.setAttribute('aria-hidden', 'true');
+      img.onload = () =>
+        console.log('[goatcounter] Fallback <img> ping loaded successfully');
+      img.onerror = (e) =>
+        console.error('[goatcounter] Fallback <img> ping failed to load:', e);
       document.body.appendChild(img);
     }
   }
 
   function setupTracking() {
+    console.log('[goatcounter] setupTracking() initializing');
     let counted = false;
     let visibleStartTime =
       document.visibilityState === 'visible' ? Date.now() : 0;
     let dwellTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const executeCount = () => {
+    console.log(
+      '[goatcounter] Initial visibilityState:',
+      document.visibilityState,
+      'visibleStartTime:',
+      visibleStartTime,
+    );
+
+    const executeCount = (reason: string) => {
+      console.log(`[goatcounter] executeCount() called -> reason: "${reason}"`);
       count({
         path: window.location.pathname + window.location.search,
         referrer: document.referrer,
@@ -228,20 +288,38 @@
     };
 
     const cleanup = () => {
+      console.log(
+        '[goatcounter] Cleaning up tracking event listeners & timers',
+      );
       events.forEach((ev) => window.removeEventListener(ev, trigger));
       window.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       window.removeEventListener('pagehide', onExit);
-      if (dwellTimer !== null) clearTimeout(dwellTimer);
+      if (dwellTimer !== null) {
+        clearTimeout(dwellTimer);
+        dwellTimer = null;
+      }
     };
 
-    const trigger = (e?: Event) => {
-      if (e && !e.isTrusted) return;
-      if (counted) return;
+    const trigger = (e?: Event, reasonOverride?: string) => {
+      const reason = reasonOverride ?? e?.type ?? 'manual/unknown';
+      console.log(`[goatcounter] trigger() fired -> reason: "${reason}"`, {
+        event: e,
+        alreadyCounted: counted,
+      });
+
+      if (e && !e.isTrusted) {
+        console.warn('[goatcounter] Ignored untrusted/synthetic event:', e);
+        return;
+      }
+      if (counted) {
+        console.log('[goatcounter] Ignored trigger: Page view already counted');
+        return;
+      }
       counted = true;
 
       cleanup();
-      executeCount();
+      executeCount(reason);
     };
 
     const events = [
@@ -260,34 +338,80 @@
       if (initialX === null || initialY === null) {
         initialX = e.clientX;
         initialY = e.clientY;
+        console.log(
+          `[goatcounter] Initial mouse coordinates set: (${initialX}, ${initialY})`,
+        );
         return;
       }
-      if (
-        Math.abs(e.clientX - initialX) > 2 ||
-        Math.abs(e.clientY - initialY) > 2
-      ) {
-        trigger(e);
+      const dx = Math.abs(e.clientX - initialX);
+      const dy = Math.abs(e.clientY - initialY);
+      if (dx > 2 || dy > 2) {
+        console.log(
+          `[goatcounter] Mouse move threshold exceeded (dx: ${dx}, dy: ${dy})`,
+        );
+        trigger(e, 'mousemove (>2px)');
       }
     };
 
     const scheduleDwellTimer = () => {
-      if (dwellTimer !== null) clearTimeout(dwellTimer);
+      if (dwellTimer !== null) {
+        console.log('[goatcounter] Resetting previous dwell timer');
+        clearTimeout(dwellTimer);
+        dwellTimer = null;
+      }
       if (document.visibilityState === 'visible') {
         if (!visibleStartTime) visibleStartTime = Date.now();
+        console.log('[goatcounter] Scheduling 2000ms dwell timer...');
         dwellTimer = setTimeout(() => {
-          if (document.visibilityState === 'visible') trigger();
+          console.log(
+            '[goatcounter] 2000ms dwell timer elapsed. visibilityState:',
+            document.visibilityState,
+          );
+          if (document.visibilityState === 'visible') {
+            trigger(undefined, 'dwell timer (2000ms)');
+          } else {
+            console.log(
+              '[goatcounter] Dwell timer elapsed but document is no longer visible.',
+            );
+          }
         }, 2000);
+      } else {
+        console.log(
+          '[goatcounter] Document is hidden; dwell timer not scheduled',
+        );
       }
     };
 
     const onExit = () => {
-      if (counted) return;
-      if (visibleStartTime && Date.now() - visibleStartTime > 1000) {
-        trigger();
+      console.log('[goatcounter] onExit() called (pagehide/visibility hidden)');
+      if (counted) {
+        console.log(
+          '[goatcounter] onExit(): Already counted, ignoring exit check',
+        );
+        return;
+      }
+      const dwellDuration = visibleStartTime
+        ? Date.now() - visibleStartTime
+        : 0;
+      console.log(
+        `[goatcounter] onExit(): Dwell duration prior to exit was ${dwellDuration}ms`,
+      );
+      if (visibleStartTime && dwellDuration > 1000) {
+        console.log(
+          '[goatcounter] Dwell duration > 1000ms on exit -> triggering count',
+        );
+        trigger(undefined, `exit with dwell (${dwellDuration}ms > 1000ms)`);
+      } else {
+        console.log(
+          '[goatcounter] Dwell duration too short (<= 1000ms); ping discarded on exit',
+        );
       }
     };
 
     const onVisibilityChange = () => {
+      console.log(
+        `[goatcounter] visibilitychange detected: ${document.visibilityState}`,
+      );
       if (document.visibilityState === 'visible') {
         scheduleDwellTimer();
       } else {
@@ -295,6 +419,7 @@
       }
     };
 
+    console.log('[goatcounter] Attaching user interaction listeners:', events);
     events.forEach((ev) =>
       window.addEventListener(ev, trigger, { once: true, passive: true }),
     );
@@ -312,8 +437,21 @@
   }
 
   if (document.prerendering) {
-    document.addEventListener('prerenderingchange', init, { once: true });
+    console.log(
+      '[goatcounter] Document is in prerendering state. Awaiting prerenderingchange event...',
+    );
+    document.addEventListener(
+      'prerenderingchange',
+      () => {
+        console.log('[goatcounter] prerenderingchange fired. Running init()');
+        init();
+      },
+      { once: true },
+    );
   } else {
+    console.log(
+      '[goatcounter] Document not prerendering; running init() immediately',
+    );
     init();
   }
 </script>
