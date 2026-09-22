@@ -144,30 +144,16 @@
   }
 
   function isBot() {
-    if (window.callPhantom || window._phantom || window.phantom) return 150;
-    if (window.__nightmare) return 151;
-    if (
-      document.__selenium_unwrapped ||
-      document.__webdriver_evaluate ||
-      document.__driver_evaluate
-    ) {
-      return 152;
-    }
-    if (navigator.webdriver) return 153;
-    if (
+    return (
+      navigator.webdriver ||
       window.screen.width === 0 ||
-      window.screen.height === 0 ||
-      (window.outerWidth === 0 && window.outerHeight === 0)
-    ) {
-      return 154;
-    }
-
-    return 0;
+      window.screen.height === 0
+    );
   }
 
   function filterCount() {
     const bot = isBot();
-    if (bot) return `bot (${bot})`;
+    if (bot) return 'bot';
     if (window.location !== window.parent.location) return 'frame';
     if (
       /^(localhost$|127\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|0\.0\.0\.0$)/.test(
@@ -204,7 +190,7 @@
 
     const url = `https://g.hawksley.dev/count?${new URLSearchParams(data).toString()}`;
 
-    if (!navigator.sendBeacon(url)) {
+    if (!navigator.sendBeacon || !navigator.sendBeacon(url)) {
       const img = document.createElement('img');
       img.src = url;
       img.style.display = 'none';
@@ -216,9 +202,6 @@
 
   function setupTracking() {
     let counted = false;
-    let visibleStartTime =
-      document.visibilityState === 'visible' ? Date.now() : 0;
-    let dwellTimer: ReturnType<typeof setTimeout> | null = null;
 
     const executeCount = () => {
       count({
@@ -230,9 +213,6 @@
     const cleanup = () => {
       events.forEach((ev) => window.removeEventListener(ev, trigger));
       window.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('pagehide', onExit);
-      if (dwellTimer !== null) clearTimeout(dwellTimer);
     };
 
     const trigger = (e?: Event) => {
@@ -270,39 +250,10 @@
       }
     };
 
-    const scheduleDwellTimer = () => {
-      if (dwellTimer !== null) clearTimeout(dwellTimer);
-      if (document.visibilityState === 'visible') {
-        if (!visibleStartTime) visibleStartTime = Date.now();
-        dwellTimer = setTimeout(() => {
-          if (document.visibilityState === 'visible') trigger();
-        }, 2000);
-      }
-    };
-
-    const onExit = () => {
-      if (counted) return;
-      if (visibleStartTime && Date.now() - visibleStartTime > 1000) {
-        trigger();
-      }
-    };
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        scheduleDwellTimer();
-      } else {
-        onExit();
-      }
-    };
-
     events.forEach((ev) =>
       window.addEventListener(ev, trigger, { once: true, passive: true }),
     );
     window.addEventListener('mousemove', onMouseMove, { passive: true });
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    window.addEventListener('pagehide', onExit, { once: true });
-
-    scheduleDwellTimer();
   }
 
   function init() {
