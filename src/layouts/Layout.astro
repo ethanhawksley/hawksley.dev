@@ -221,6 +221,24 @@ const isIndexable = !robots.includes('noindex');
 
     {isHome && <link rel="me" href="https://mastodon.social/@ethanhawksley" />}
 
+    <script
+      type="speculationrules"
+      is:inline
+      set:html={JSON.stringify({
+        prerender: [
+          {
+            where: {
+              and: [
+                { href_matches: '/*' },
+                { not: { selector_matches: '[data-no-prefetch]' } },
+              ],
+            },
+            eagerness: 'moderate',
+          },
+        ],
+      })}
+    />
+
     {
       jsonLd && (
         <script

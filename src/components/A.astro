@@ -2,7 +2,12 @@
 import type { HTMLAttributes } from 'astro/types';
 
 const protocols = new Set(['http:', 'https:']);
-const internalHostnames = new Set(['hawksley.dev', '127.0.0.1', 'localhost']);
+const internalHostnames = new Set([
+  'hawksley.dev',
+  '127.0.0.1',
+  'localhost',
+  '0.0.0.0',
+]);
 
 interface Props extends HTMLAttributes<'a'> {
   href: string;
@@ -11,13 +16,26 @@ interface Props extends HTMLAttributes<'a'> {
 }
 const { href, rel, style, pressable, external, ...rest } = Astro.props;
 
-function isExternal(linkHref: string) {
-  const url = new URL(linkHref, Astro.url);
+function isExternal(linkHref: string): boolean {
+  if (/^(?:[#/.]|\/(?!\/))/i.test(linkHref)) {
+    return false;
+  }
 
-  // Treat unknown protocols as internal
-  if (!protocols.has(url.protocol)) return false;
+  try {
+    const url = new URL(linkHref, Astro.url);
 
-  return !internalHostnames.has(url.hostname);
+    if (!protocols.has(url.protocol)) return false;
+
+    if (url.hostname === Astro.url.hostname) return false;
+
+    if (internalHostnames.has(url.hostname)) return false;
+
+    if (Astro.site && url.hostname === Astro.site.hostname) return false;
+
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 const isExternalLink = external ?? isExternal(href);

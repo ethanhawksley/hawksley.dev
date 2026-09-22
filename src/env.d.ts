@@ -17,3 +17,11 @@ interface Document {
   __webdriver_evaluate?: unknown;
   __driver_evaluate?: unknown;
 }
+
+interface Navigator {
+  readonly connection?: NetworkInformation;
+}
+
+interface NetworkInformation {
+  readonly saveData?: boolean;
+}
