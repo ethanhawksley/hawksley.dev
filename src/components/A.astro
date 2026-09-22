@@ -14,7 +14,7 @@ interface Props extends HTMLAttributes<'a'> {
   pressable?: boolean;
   external?: boolean;
 }
-const { href, rel, style, pressable, external, ...rest } = Astro.props;
+const { href, pressable, external, ...rest } = Astro.props;
 
 function isExternal(linkHref: string): boolean {
   if (/^(?:[#/.]|\/(?!\/))/i.test(linkHref)) {
@@ -44,8 +44,6 @@ const isExternalLink = external ?? isExternal(href);
 <a
   href={href}
   target={isExternalLink ? '_blank' : undefined}
-  rel={rel || (isExternalLink ? 'noopener noreferrer' : undefined)}
-  style={style}
   data-pressable={pressable || undefined}
   {...rest}
   ><span
