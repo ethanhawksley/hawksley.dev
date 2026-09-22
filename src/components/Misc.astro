@@ -203,9 +203,7 @@
   function setupTracking() {
     let counted = false;
 
-    const executeCount = (reason: string = 'unknown') => {
-      new Image().src = `https://example.com/${encodeURIComponent(reason)}`;
-
+    const executeCount = () => {
       count({
         path: window.location.pathname + window.location.search,
         referrer: document.referrer,
@@ -222,10 +220,8 @@
       if (counted) return;
       counted = true;
 
-      const reason = e?.type ?? 'unknown';
-
       cleanup();
-      executeCount(reason);
+      executeCount();
     };
 
     const events = [
