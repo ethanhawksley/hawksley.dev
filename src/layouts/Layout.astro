@@ -3,7 +3,7 @@ import Footer from '../components/Footer.astro';
 import Misc from '../components/Misc.astro';
 import Navigation from '../components/Navigation.astro';
 
-import { OG_IMAGE_VERSION } from '../utils/constants.ts';
+import { FAVICON_VERSION, OG_IMAGE_VERSION } from '../utils/constants.ts';
 
 interface Props {
   title: string;
@@ -59,6 +59,21 @@ const isIndexable = !robots.includes('noindex');
     />
 
     <title>{title}</title>
+
+    <link
+      rel="icon"
+      href={`/favicons/v${FAVICON_VERSION}/favicon.svg`}
+      type="image/svg+xml"
+    />
+    <link
+      rel="icon"
+      href={`/favicons/v${FAVICON_VERSION}/favicon.ico`}
+      sizes="32x32"
+    />
+    <link
+      rel="apple-touch-icon"
+      href={`/favicons/v${FAVICON_VERSION}/apple-touch-icon.png`}
+    />
 
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#ff4f00" media="not all" />
@@ -213,11 +228,6 @@ const isIndexable = !robots.includes('noindex');
       type="application/feed+json"
       title="Ethan Hawksley's Blog"
     />
-
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
-    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
 
     {isHome && <link rel="me" href="https://mastodon.social/@ethanhawksley" />}
 

@@ -1,6 +1,7 @@
 import { getSortedPosts, getSortedSecondMaintainer } from './content-helpers';
 
 export const NON_CONTENT_URLS = [
+  'https://hawksley.dev/site.webmanifest',
   'https://hawksley.dev/sitemap.xml',
   'https://hawksley.dev/sitemap.txt',
   'https://hawksley.dev/key.asc',

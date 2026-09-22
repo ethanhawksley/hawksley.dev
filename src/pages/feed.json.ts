@@ -1,3 +1,4 @@
+import { FAVICON_VERSION } from '../utils/constants.ts';
 import { getPostHtml, getSortedPosts } from '../utils/content-helpers';
 
 export async function GET() {
@@ -13,8 +14,8 @@ export async function GET() {
     feed_url: `${siteUrl}feed.json`,
     authors: [{ name: 'Ethan Hawksley', url: siteUrl }],
     language: 'en',
-    favicon: 'https://hawksley.dev/icon-48x48.png',
-    icon: 'https://hawksley.dev/icon-512x512.png',
+    favicon: `https://hawksley.dev/favicons/v${FAVICON_VERSION}/favicon-48x48.png`,
+    icon: `https://hawksley.dev/favicons/v${FAVICON_VERSION}/favicon-512x512.png`,
     items: await Promise.all(
       allPosts.map(async (post) => ({
         id: `${siteUrl}blog/${post.id}`,
