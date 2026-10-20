@@ -49,9 +49,17 @@ export async function getPostHtml(post: CollectionEntry<'posts'>) {
   return html;
 }
 
-const WORDS_PER_MINUTE = 238;
+const WORDS_PER_MINUTE = 200;
+const SECONDS_PER_VIDEO = 60;
 
 export function getReadingTime(content: string | undefined) {
   const words = (content ?? '').split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
+  const readingSeconds = (words / WORDS_PER_MINUTE) * 60;
+
+  const videoMatches = (content ?? '').match(/<BlogVideo\b[^>]*>/g);
+  const videos = videoMatches?.length ?? 0;
+  const videoSeconds = videos * SECONDS_PER_VIDEO;
+
+  const totalMinutes = Math.ceil((readingSeconds + videoSeconds) / 60);
+  return Math.max(1, totalMinutes);
 }

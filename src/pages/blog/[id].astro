@@ -7,6 +7,7 @@ import { render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import A from '../../components/A.astro';
 import BlogImage from '../../components/BlogImage.astro';
+import BlogVideo from '../../components/BlogVideo.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 
@@ -167,7 +168,7 @@ const jsonLd = {
       </div>
     </header>
     <div class="prose">
-      <Content components={{ a: A, img: BlogImage }} />
+      <Content components={{ a: A, img: BlogImage, BlogVideo }} />
     </div>
     <footer class="post-colophon">
       <picture>
@@ -307,7 +308,8 @@ const jsonLd = {
     margin-bottom: 0;
   }
 
-  .prose img {
+  .prose img,
+  .prose video {
     width: auto;
     max-height: min(60vh, 34rem);
     margin-inline: auto;

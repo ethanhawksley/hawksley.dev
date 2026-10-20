@@ -19,13 +19,13 @@ export const getStaticPaths = (async () => {
   const allPosts = await getSortedPosts();
   const validBlogSlugs = new Set(allPosts.map((post) => post.id));
 
-  const imageFiles = import.meta.glob(
+  const mediaFiles = import.meta.glob(
     '/src/content/blog/**/*.{jpg,jpeg,png,webp,gif,svg,avif}',
   );
 
   const pathsToGenerate = [];
 
-  for (const filepath of Object.keys(imageFiles)) {
+  for (const filepath of Object.keys(mediaFiles)) {
     const match = filepath.match(/^\/src\/content\/blog\/([^/]+)\/(.+)$/);
     if (!match) continue;
 
@@ -47,11 +47,11 @@ export async function GET({ props }: APIContext) {
   const { filepath } = props;
   const fullPath = path.join(process.cwd(), filepath);
 
-  const imageBuffer = await fs.readFile(fullPath);
+  const mediaBuffer = await fs.readFile(fullPath);
   const extension = path.extname(filepath).toLowerCase();
   const contentType = MIME_TYPES[extension] || 'application/octet-stream';
 
-  return new Response(imageBuffer, {
+  return new Response(mediaBuffer, {
     headers: {
       'Content-Type': contentType,
     },

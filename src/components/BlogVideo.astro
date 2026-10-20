@@ -1,0 +1,65 @@
+---
+type Props = {
+  src: string;
+  poster?: string;
+  caption?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  playsinline?: boolean;
+};
+
+const {
+  src,
+  poster,
+  caption,
+  controls = true,
+  autoplay = false,
+  loop = false,
+  muted = false,
+  playsinline = true,
+  ...attrs
+} = Astro.props;
+
+function getStableUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  if (/^(?:https?:|\/\/|\/)/i.test(url)) return url;
+  return Astro.params.id
+    ? `/blog/${Astro.params.id}/${url.replace(/^\.\//, '')}`
+    : url;
+}
+
+const videoUrl = getStableUrl(src);
+const posterUrl = getStableUrl(poster);
+---
+
+<figure class="blog-video-container">
+  <video
+    src={videoUrl}
+    poster={posterUrl}
+    controls={controls}
+    autoplay={autoplay}
+    loop={loop}
+    muted={autoplay ? true : muted}
+    playsinline={playsinline}
+    preload="metadata"
+    {...attrs}></video>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .blog-video-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5rem 0;
+  }
+
+  figcaption {
+    margin-top: 0.5rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+</style>
