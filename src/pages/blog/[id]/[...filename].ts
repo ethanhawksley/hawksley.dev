@@ -13,6 +13,7 @@ const MIME_TYPES: Record<string, string> = {
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.avif': 'image/avif',
+  '.mp4': 'video/mp4',
 };
 
 export const getStaticPaths = (async () => {
@@ -20,7 +21,7 @@ export const getStaticPaths = (async () => {
   const validBlogSlugs = new Set(allPosts.map((post) => post.id));
 
   const mediaFiles = import.meta.glob(
-    '/src/content/blog/**/*.{jpg,jpeg,png,webp,gif,svg,avif}',
+    '/src/content/blog/**/*.{jpg,jpeg,png,webp,gif,svg,avif,mp4}',
   );
 
   const pathsToGenerate = [];
